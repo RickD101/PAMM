@@ -34,6 +34,7 @@ Temporary Items
 
 # dependencies
 client/node_modules
+server/node_modules
 client/.pnp
 .pnp.js
 
