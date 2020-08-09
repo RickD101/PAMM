@@ -71,7 +71,7 @@ router.post('/new', async (req,res)=>{
     }
     catch(err){
         res.status(400).send({
-            msg: 'bad request.',
+            msg: 'Bad request.',
             err: err
         });
     }

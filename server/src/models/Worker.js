@@ -10,7 +10,8 @@ const schema = new mongoose.Schema({
         required: true
     },
     user_profile: {
-        type: String
+        type: mongoose.Schema.Types.ObjectID,
+        ref: 'User'
     },
     email: {
         type: String

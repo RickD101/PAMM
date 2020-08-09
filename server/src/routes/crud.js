@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 // model inclusions
-const Client   = require('../models/Client');
-const Item     = require('../models/Item');
-const Supplier = require('../models/Supplier');
-const Worker   = require('../models/Worker');
-const Asset    = require('../models/Asset');
-const Routine  = require('../models/Routine');
+const Client    = require('../models/Client');
+const Item      = require('../models/Item');
+const Supplier  = require('../models/Supplier');
+const Worker    = require('../models/Worker');
+const Asset     = require('../models/Asset');
+const Routine   = require('../models/Routine');
+const WorkOrder = require('../models/WorkOrder');
 
 // auth check
 router.use((req, res, next) => {
@@ -39,7 +40,7 @@ router.post('/create', async (req, res) => {
                 data = await Worker.create(req.body.data);
                 break;
             case 'Asset':
-                findClient = await Client.findOne({
+                let findClient = await Client.findOne({
                     _id: req.body.data.client
                 });
                 if (findClient) {
@@ -50,14 +51,28 @@ router.post('/create', async (req, res) => {
                 }
                 break;
             case 'Routine':
-                findClient = await Asset.findOne({
+                let findAsset = await Asset.findOne({
                     _id: req.body.data.asset
                 });
-                if (findClient) {
+                if (findAsset) {
                     data = await Routine.create(req.body.data);
                 }
                 else {
                     throw 'Associated asset not found.'
+                }
+                break;
+            case 'WorkOrder':
+                let findClientWO = await Client.findOne({
+                    _id: req.body.data.client
+                });
+                let findAssetWO = await Asset.findOne({
+                    _id: req.body.data.asset
+                });
+                if (findAssetWO && findClientWO) {
+                    data = await WorkOrder.create(req.body.data);
+                }
+                else {
+                    throw 'Associated client or asset not found.'
                 }
                 break;
         }
@@ -74,7 +89,7 @@ router.post('/create', async (req, res) => {
     }
     catch (err) {
         res.status(400).send({
-            msg: 'bad request.',
+            msg: 'Bad request.',
             err: err
         });
     }
@@ -89,20 +104,22 @@ router.get('/read', async (req, res) => {
                 data = await Client.find();
                 break;
             case 'Item':
-                data = await Item.find();
+                data = await Item.find().populate('suppliers');
                 break;
             case 'Supplier':
                 data = await Supplier.find();
                 break;
             case 'Worker':
-                data = await Worker.find();
+                data = await Worker.find().populate('user_profile');
                 break;
             case 'Asset':
-                data = await Asset.find();
+                data = await Asset.find().populate('client');
                 break;
             case 'Routine':
-                data = await Routine.find();
+                data = await Routine.find().populate('asset');
                 break;
+            case 'WorkOrder':
+                data = await WorkOrder.find().populate(['client', 'asset']);
         }
 
         if (!data) {
@@ -124,7 +141,7 @@ router.get('/read', async (req, res) => {
     }
     catch (err) {
         res.status(400).send({
-            msg: 'bad request.',
+            msg: 'Bad request.',
             err: err
         });
     }
@@ -189,6 +206,15 @@ router.patch('/update', async (req, res) => {
                     {new: true}
                 );
                 break;
+            case 'WorkOrder':
+                data = await WorkOrder.findOneAndUpdate(
+                    {
+                        _id: req.body.id
+                    },
+                    req.body.data,
+                    {new: true}
+                );
+                break;
         }
 
         if (data) {
@@ -203,7 +229,7 @@ router.patch('/update', async (req, res) => {
     }
     catch (err) {
         res.status(400).send({
-            msg: 'bad request.',
+            msg: 'Bad request.',
             err: err
         });
     }
@@ -260,6 +286,11 @@ router.delete('/delete', async (req, res) => {
                     _id: req.body.id
                 });
                 break;
+            case 'WorkOrder':
+                data = await WorkOrder.findOneAndDelete({
+                    _id: req.body.id
+                });
+                break;
         }
 
         if (data) {
@@ -274,7 +305,68 @@ router.delete('/delete', async (req, res) => {
     }
     catch (err) {
         res.status(400).send({
-            msg: 'bad request.',
+            msg: 'Bad request.',
+            err: err
+        });
+    }
+});
+
+// Search by ID
+router.get('/findOne', async (req, res) => {
+    try {
+        let data;
+        switch (req.body.model) {
+            case 'Client':
+                data = await Client.findOne({
+                    _id: req.body.id
+                });
+                break;
+            case 'Item':
+                data = await Item.findOne({
+                    _id: req.body.id
+                });
+                break;
+            case 'Supplier':
+                data = await Supplier.findOne({
+                    _id: req.body.id
+                });
+                break;
+            case 'Worker':
+                data = await Worker.findOne({
+                    _id: req.body.id
+                });
+                break;
+            case 'Asset':
+                data = await Asset.findOne({
+                    _id: req.body.id
+                });
+                break;
+            case 'Routine':
+                data = await Routine.findOne({
+                    _id: req.body.id
+                });
+                break;
+            case 'WorkOrder':
+                data = await WorkOrder.findOne({
+                    _id: req.body.id
+                });
+                break;
+        }
+
+        if (data) {
+            res.send({
+                status: true,
+                msg: req.body.model + ' found.',
+                data: data
+            });
+        }
+        else {
+            throw `No matching ${req.body.model} found.`
+        }
+    }
+    catch (err) {
+        res.status(400).send({
+            msg: 'Bad request.',
             err: err
         });
     }

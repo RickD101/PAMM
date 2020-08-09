@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
     asset: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectID,
+        ref: 'Asset',
         required: true
     },
     initial: {
