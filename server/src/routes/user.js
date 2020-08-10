@@ -85,6 +85,7 @@ router.post('/login', async (req,res)=>{
         if (!savedUser){
             res.status(404).send({
                 status: false,
+                field: 'username',
                 msg: req.body.username + ' not found.'
             });
         }
@@ -103,6 +104,7 @@ router.post('/login', async (req,res)=>{
         else{
             res.status(404).send({
                 status: false,
+                field: 'password',
                 msg: 'Incorrect password.'
             });
         }
