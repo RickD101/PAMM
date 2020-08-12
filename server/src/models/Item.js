@@ -19,10 +19,10 @@ const schema = new mongoose.Schema({
     quantity: {
         type: Number
     },
-    suppliers: [{
+    supplier: {
         type: mongoose.Schema.Types.ObjectID,
         ref: 'Supplier'
-    }]
+    }
 });
 
 module.exports = mongoose.model('Item', schema);

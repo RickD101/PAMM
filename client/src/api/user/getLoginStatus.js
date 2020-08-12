@@ -1,7 +1,7 @@
 // get user status backend API call
 const getLoginStatus = async () => {
     try {
-        const response = await fetch('/user/', {
+        const response = await fetch('/user', {
             method: 'GET',
             mode: 'cors',
             credentials: 'same-origin'

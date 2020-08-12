@@ -5,12 +5,13 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 // inclusions
 import getLoginStatus from './api/user/getLoginStatus';
 import Login from './components/user/Login';
-import Home from './components/level_one/Home';
+import Home from './components/level_1/Home';
 import AppBarMenu from './components/navigation/AppBarMenu';
-import Reports from './components/level_one/Reports';
-import Clients from './components/level_one/Clients';
-import Labour from './components/level_one/Labour';
-import Inventory from './components/level_one/Inventory';
+import Reports from './components/level_1/Reports';
+import Clients from './components/level_1/Clients';
+import Labour from './components/level_1/Labour';
+import Inventory from './components/level_1/Inventory';
+import Suppliers from './components/level_2/Suppliers';
 
 export default function App() {
 
@@ -55,6 +56,12 @@ export default function App() {
                 <Route exact path="/inventory">
                     {loginStatus 
                         ? <Inventory />
+                        : <Redirect to="/login"/>
+                    }
+                </Route>
+                <Route exact path="/inventory/suppliers">
+                    {loginStatus 
+                        ? <Suppliers />
                         : <Redirect to="/login"/>
                     }
                 </Route>

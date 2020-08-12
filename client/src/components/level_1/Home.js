@@ -14,13 +14,13 @@ import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        margin: '20px 25px',
+        margin: '30px',
         flexGrow: 1,
     },
     paper: {
         padding: theme.spacing(2),
         textAlign: 'center',
-        minHeight: '400px',
+        minHeight: '480px',
         color: theme.palette.text.secondary,
         background: 'lightgrey',
     },

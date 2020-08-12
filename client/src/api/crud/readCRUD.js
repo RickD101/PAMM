@@ -1,7 +1,6 @@
-// user login backend API call
-const userLogin = async (req) => {
+const readCRUD = async (req) => {
     try {
-        const response = await fetch('/user/login', {
+        const response = await fetch('/crud/read', {
             method: 'POST',
             mode: 'cors',
             credentials: 'same-origin',
@@ -15,11 +14,8 @@ const userLogin = async (req) => {
     }
     catch (err) {
         console.log(err);
-        return {
-            status: false,
-            msg: 'The server failed to respond.'
-        }
+        return false;
     }
 }
 
-export default userLogin;
+export default readCRUD;

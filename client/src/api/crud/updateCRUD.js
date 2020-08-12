@@ -1,8 +1,8 @@
-// user login backend API call
-const userLogin = async (req) => {
-    try {
-        const response = await fetch('/user/login', {
-            method: 'POST',
+// create new user backend API call
+const updateCRUD = async (req)=>{
+    try{
+        const response = await fetch('/crud/update', {
+            method: 'PATCH',
             mode: 'cors',
             credentials: 'same-origin',
             headers: {
@@ -13,13 +13,9 @@ const userLogin = async (req) => {
         const data = await response.json();
         return data;
     }
-    catch (err) {
+    catch(err){
         console.log(err);
-        return {
-            status: false,
-            msg: 'The server failed to respond.'
-        }
     }
 }
 
-export default userLogin;
+export default updateCRUD;

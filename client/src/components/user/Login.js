@@ -85,6 +85,12 @@ export default function Login(props) {
                 setPasswordError(response.msg);
                 setPasswordValid(false);
             }
+            else {
+                setUsernameError(response.msg);
+                setUsernameValid(false);
+                setPasswordError(response.msg);
+                setPasswordValid(false);
+            }
         }
     }
 

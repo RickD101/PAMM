@@ -1,5 +1,6 @@
 // package imports
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -21,6 +22,10 @@ const useStyles = makeStyles((theme) => ({
     title: {
         flexGrow: 1,
     },
+    home: {
+        textDecoration: 'none',
+        color: 'inherit',
+    }
 }));
 
 export default function AppBarMenu(props) {
@@ -36,7 +41,9 @@ export default function AppBarMenu(props) {
                         </IconButton>
                     }
                     <Typography variant="h6" className={classes.title}>
-                        PAMM: The Plant/Asset Maintenance Manager
+                        <Link to="/" className={classes.home}>
+                            PAMM: The Plant/Asset Maintenance Manager
+                        </Link>
                     </Typography>
                     {props.loginStatus &&
                         <Button 

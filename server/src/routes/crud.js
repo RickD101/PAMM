@@ -17,6 +17,7 @@ router.use((req, res, next) => {
     }
     else {
         res.status(401).send({
+            status: false,
             msg: 'Please login to access.'
         });
     }
@@ -47,7 +48,7 @@ router.post('/create', async (req, res) => {
                     data = await Asset.create(req.body.data);
                 }
                 else {
-                    throw 'Associated client not found.'
+                    throw new Error({_message: 'Associated client not found.'});
                 }
                 break;
             case 'Routine':
@@ -58,7 +59,7 @@ router.post('/create', async (req, res) => {
                     data = await Routine.create(req.body.data);
                 }
                 else {
-                    throw 'Associated asset not found.'
+                    throw new Error({_message: 'Associated asset not found.'});
                 }
                 break;
             case 'WorkOrder':
@@ -72,7 +73,7 @@ router.post('/create', async (req, res) => {
                     data = await WorkOrder.create(req.body.data);
                 }
                 else {
-                    throw 'Associated client or asset not found.'
+                    throw new Error({_message: 'Associated client or asset not found.'});
                 }
                 break;
         }
@@ -80,23 +81,24 @@ router.post('/create', async (req, res) => {
         if (data) {
             res.send({
                 status: true,
-                msg: req.body.model + ' saved to database.'
+                msg: req.body.model + ' saved to database.',
+                id: data._id
             });
         }
         else {
-            throw 'No matching model found.'
+            throw new Error({_message: 'No matching model found.'});
         }
     }
     catch (err) {
         res.status(400).send({
-            msg: 'Bad request.',
-            err: err
+            status: false,
+            msg: err._message
         });
     }
 });
 
 // READ route
-router.get('/read', async (req, res) => {
+router.post('/read', async (req, res) => {
     try {
         let data;
         switch (req.body.model) {
@@ -123,12 +125,13 @@ router.get('/read', async (req, res) => {
         }
 
         if (!data) {
-            throw 'No matching model found.'
+            throw new Error({_message: 'No matching model found.'});
         }
         else if (!data[0]) {
             res.send({
                 status: false,
-                msg: 'No ' + req.body.model + 's found.'
+                msg: `No ${req.body.model}s found.`,
+                data: data
             });
         }
         else if (data) {
@@ -141,8 +144,8 @@ router.get('/read', async (req, res) => {
     }
     catch (err) {
         res.status(400).send({
-            msg: 'Bad request.',
-            err: err
+            status: false,
+            msg: err._message
         });
     }
 });
@@ -224,13 +227,13 @@ router.patch('/update', async (req, res) => {
             });
         }
         else {
-            throw 'No matching model found.'
+            throw new Error({_message: 'No matching model found.'});
         }
     }
     catch (err) {
         res.status(400).send({
-            msg: 'Bad request.',
-            err: err
+            status: false,
+            msg: err._message
         });
     }
 });
@@ -300,13 +303,13 @@ router.delete('/delete', async (req, res) => {
             });
         }
         else {
-            throw 'No matching model found.'
+            throw new Error({_message: 'No matching model found.'});
         }
     }
     catch (err) {
         res.status(400).send({
-            msg: 'Bad request.',
-            err: err
+            status: false,
+            msg: err._message
         });
     }
 });
@@ -361,13 +364,13 @@ router.get('/findOne', async (req, res) => {
             });
         }
         else {
-            throw `No matching ${req.body.model} found.`
+            throw new Error({_message: `No matching ${req.body.model} found.`});
         }
     }
     catch (err) {
         res.status(400).send({
-            msg: 'Bad request.',
-            err: err
+            status: false,
+            msg: err._message
         });
     }
 });
