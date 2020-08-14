@@ -1,13 +1,14 @@
 // package imports
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 
 // inclusions
 import MaterialTableComponent from '../general/MaterialTableComponent';
 import ManageButton from '../general/ManageButton';
-import readCRUD from '../../api/crud/readCRUD';
+import findOneCRUD from '../../api/crud/findOneCRUD';
+import findCRUD from '../../api/crud/findCRUD';
 
 const useStyles = makeStyles((theme) => ({
     breadcrumb: {
@@ -19,35 +20,43 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function Clients() {
+export default function Assets() {
     const classes = useStyles();
+    const { id } = useParams();
 
     // table columns
     const columns = [
         {title: "id", field: "_id", hidden: true},
+        {title: "client", field: "client", hidden: true},
         {title: "Name", field: "name"},
-        {title: "Contact Name", field: "contact"},
-        {title: "Number", field: "number"},
-        {title: "Email", field: "email"},
-        {title: "Address", field: "address"},
-        {title: "Assets", render: 
+        {title: "Description", field: "description"},
+        {title: "Grouping", field: "grouping"},
+        {title: "Routines", render: 
             rowData => <ManageButton 
-                linkTo={`/clients/assets/${rowData._id}`} 
+                linkTo={`/clients/assets/routines/${rowData._id}`} 
                 data={rowData} 
-                passClass={classes.navButtonText}/>}
+                passClass={classes.navButtonText}/>},
     ];
 
     // table data
     const [data, setData] = useState([]);
+    const [clientData, setClientData] = useState({});
 
     useEffect(() => {
-        document.title = 'PAMM: Client Management';
+        document.title = 'PAMM: Asset Management';
 
-        readCRUD({model: "Client"}).then((response)=>{
+        findOneCRUD({model: "Client", id: id}).then((response)=>{
+            setClientData(response.data);
+        }).catch((err)=>{
+            alert(err);
+        });
+
+        findCRUD({model: "Asset", searchFields: {client: id}}).then((response)=>{
             setData(response.data);
         }).catch((err)=>{
             alert(err);
         })
+
     }, []);
 
     return (
@@ -57,19 +66,21 @@ export default function Clients() {
                 <Grid item xs={10}>
                     <h2>
                         <Link to="/" className={classes.breadcrumb}>Home</Link>
-                        /Client Management
+                        /<Link to="/clients" className={classes.breadcrumb}>Client Management</Link>
+                        /Asset Management for {clientData.name}
                     </h2>
                 </Grid>
                 <Grid item xs={1}></Grid>
             </Grid>
 
             <MaterialTableComponent 
-                model={'Client'}
-                title={'Clients'}
+                model={'Asset'}
+                title={`${clientData.name} Assets`}
                 columns={columns}
                 data={data}
                 setData={setData}
                 pageSize={6}
+                additionalFields = {{client: clientData._id}}
             />
         </>
     )

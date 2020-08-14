@@ -5,12 +5,16 @@ const schema = new mongoose.Schema({
         type: String,
         required: true
     },
-    contact: [{
-        name: String,
-        number: Number,
-        email: String
-    }],
-    code: {
+    contact: {
+        type: String
+    },
+    number: {
+        type: String
+    },
+    email: {
+        type: String
+    },
+    address: {
         type: String
     }
 });

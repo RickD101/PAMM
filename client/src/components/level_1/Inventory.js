@@ -44,7 +44,7 @@ export default function Inventory() {
         {title: "Cost", field: "cost", type: "currency"},
         {title: "Quantity in Stock", field: "quantity"},
         {title: "Code", field: "code"},
-        {title: "Supplier", field: "supplier", lookup: suppData}
+        {title: "Supplier", field: "supplier._id", lookup: suppData}
     ];
 
     useEffect(() => {
@@ -54,12 +54,14 @@ export default function Inventory() {
             setData(response.data);
         }).then(
             readCRUD({model: "Supplier"}).then((response)=>{
-                const options = {};
-                response.data.map(supplier => {
-                    options[supplier._id] = supplier.name;
-                    return null
-                });
-                setSuppData(options);
+                if (response.data) {
+                    const options = {};
+                    response.data.map(supplier => {
+                        options[supplier._id] = supplier.name;
+                        return null;
+                    });
+                    setSuppData(options);
+                }
         })).catch((err)=>{
             alert(err);
         })

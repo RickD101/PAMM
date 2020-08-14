@@ -106,7 +106,7 @@ router.post('/read', async (req, res) => {
                 data = await Client.find();
                 break;
             case 'Item':
-                data = await Item.find().populate('suppliers');
+                data = await Item.find().populate('supplier');
                 break;
             case 'Supplier':
                 data = await Supplier.find();
@@ -314,8 +314,8 @@ router.delete('/delete', async (req, res) => {
     }
 });
 
-// Search by ID
-router.get('/findOne', async (req, res) => {
+// Search for one by ID
+router.post('/findOne', async (req, res) => {
     try {
         let data;
         switch (req.body.model) {
@@ -327,7 +327,7 @@ router.get('/findOne', async (req, res) => {
             case 'Item':
                 data = await Item.findOne({
                     _id: req.body.id
-                });
+                }).populate('supplier');
                 break;
             case 'Supplier':
                 data = await Supplier.findOne({
@@ -337,22 +337,22 @@ router.get('/findOne', async (req, res) => {
             case 'Worker':
                 data = await Worker.findOne({
                     _id: req.body.id
-                });
+                }).populate('user_profile');
                 break;
             case 'Asset':
                 data = await Asset.findOne({
                     _id: req.body.id
-                });
+                }).populate('client');
                 break;
             case 'Routine':
                 data = await Routine.findOne({
                     _id: req.body.id
-                });
+                }).populate('asset');
                 break;
             case 'WorkOrder':
                 data = await WorkOrder.findOne({
                     _id: req.body.id
-                });
+                }).populate(['client', 'asset']);
                 break;
         }
 
@@ -365,6 +365,59 @@ router.get('/findOne', async (req, res) => {
         }
         else {
             throw new Error({_message: `No matching ${req.body.model} found.`});
+        }
+    }
+    catch (err) {
+        res.status(400).send({
+            status: false,
+            msg: err._message
+        });
+    }
+});
+
+// Search by field
+router.post('/find', async (req, res) => {
+    try {
+        let data;
+        switch (req.body.model) {
+            case 'Client':
+                data = await Client.find(req.body.searchFields);
+                break;
+            case 'Item':
+                data = await Item.find(req.body.searchFields).populate('supplier');
+                break;
+            case 'Supplier':
+                data = await Supplier.find(req.body.searchFields);
+                break;
+            case 'Worker':
+                data = await Worker.find(req.body.searchFields).populate('user_profile');
+                break;
+            case 'Asset':
+                data = await Asset.find(req.body.searchFields).populate('client');
+                break;
+            case 'Routine':
+                data = await Routine.find(req.body.searchFields).populate('asset');
+                break;
+            case 'WorkOrder':
+                data = await WorkOrder.find(req.body.searchFields).populate(['client', 'asset']);
+        }
+
+        if (!data) {
+            throw new Error({_message: 'No matching model found.'});
+        }
+        else if (!data[0]) {
+            res.send({
+                status: false,
+                msg: `No ${req.body.model}s found.`,
+                data: data
+            });
+        }
+        else if (data) {
+            res.send({
+                status: true,
+                msg: data.length + ' ' + req.body.model + 's found.',
+                data: data
+            });
         }
     }
     catch (err) {

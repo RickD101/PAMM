@@ -6,8 +6,9 @@ const schema = new mongoose.Schema({
         ref: 'Client',
         required: true
     },
-    code: {
-        type: String
+    name: {
+        type: String,
+        requied: true
     },
     description: {
         type: String

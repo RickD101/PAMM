@@ -70,14 +70,17 @@ export default function MaterialTableComponent(props) {
                 throw new Error(`The server failed to respond.`);
             }
         }
-        catch(err) {
+        catch (err) {
             alert(err);
             resolve();
         }
     }
-    
+
     const handleRowAdd = async (newData, resolve) => {
         try {
+            if (props.additionalFields){
+                newData = {...newData, ...props.additionalFields}
+            }
             const response = await createCRUD({
                 model: props.model,
                 data: newData
@@ -85,7 +88,7 @@ export default function MaterialTableComponent(props) {
             if (response) {
                 if (response.status) {
                     newData._id = response.id;
-                    let dataToAdd = [...props.data];
+                    const dataToAdd = [...props.data];
                     dataToAdd.push(newData);
                     props.setData(dataToAdd);
                     resolve();
@@ -98,12 +101,12 @@ export default function MaterialTableComponent(props) {
                 throw new Error(`The server failed to respond.`);
             }
         }
-        catch(err) {
+        catch (err) {
             alert(err);
             resolve();
         }
     }
-    
+
     const handleRowDelete = async (oldData, resolve) => {
         try {
             const response = await deleteCRUD({
@@ -122,18 +125,46 @@ export default function MaterialTableComponent(props) {
                     throw new Error(`${response.msg}`);
                 }
             }
-            if (response.status) {
-                const dataDelete = [...props.data];
-                const index = oldData.tableData.id;
-                dataDelete.splice(index, 1);
-                props.setData([...dataDelete]);
-                resolve();
-            }
             else {
-                throw new Error(`${response.msg}`);
+                throw new Error(`The server failed to respond.`);
             }
         }
-        catch(err) {
+        catch (err) {
+            alert(err);
+            resolve();
+        }
+    }
+
+    const handleBulkDelete = async (data, resolve) => {
+        try {
+            const deleteIDs = [];
+            await Promise.all(
+                data.map(async (selected) => {
+                    const response = await deleteCRUD({
+                        model: props.model,
+                        id: selected._id
+                    });
+                    if (response) {
+                        if (response.status) {
+                            deleteIDs.push(selected._id);
+                        }
+                        else {
+                            throw new Error(`${response.msg}`);
+                        }
+                    }
+                    else {
+                        throw new Error(`The server failed to respond.`);
+                    }
+                })
+            )
+            let dataDelete = [...props.data];
+            deleteIDs.forEach(id => {
+                dataDelete = dataDelete.filter(entry => entry._id !== id);
+            });
+            props.setData([...dataDelete]);
+            resolve();
+        }
+        catch (err) {
             alert(err);
             resolve();
         }
@@ -151,7 +182,7 @@ export default function MaterialTableComponent(props) {
                     editable={{
                         onRowUpdate: (newData, oldData) =>
                             new Promise((resolve) => {
-                                handleRowUpdate(newData, oldData, resolve);                      
+                                handleRowUpdate(newData, oldData, resolve);
                             }),
                         onRowAdd: (newData) =>
                             new Promise((resolve) => {
@@ -164,8 +195,19 @@ export default function MaterialTableComponent(props) {
                     }}
                     options={{
                         pageSize: props.pageSize,
-                        pageSizeOptions: []
+                        pageSizeOptions: [],
+                        selection: true
                     }}
+                    actions={[
+                        {
+                            tooltip: `Remove All Selected ${props.model}s?`,
+                            icon: tableIcons.Delete,
+                            onClick: (evt, data) =>
+                                new Promise((resolve) => {
+                                    handleBulkDelete(data, resolve);
+                                }),
+                        }
+                    ]}
                 />
             </Grid>
             <Grid item xs={1}></Grid>
