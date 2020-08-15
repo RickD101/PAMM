@@ -72,10 +72,10 @@ export default function Inventory() {
             <Grid container spacing={0}>
                 <Grid item xs={1}></Grid>
                 <Grid item xs={10}>
-                    <h2>
+                    <h3>
                         <Link to="/" className={classes.breadcrumb}>Home</Link>
                         /Inventory Management
-                    </h2>
+                    </h3>
                 </Grid>
                 <Grid item xs={1}></Grid>
             </Grid>

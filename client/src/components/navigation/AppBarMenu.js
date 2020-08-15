@@ -36,7 +36,13 @@ export default function AppBarMenu(props) {
             <AppBar position="sticky">
                 <Toolbar>
                     {props.loginStatus &&
-                        <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                        <IconButton 
+                            edge="start" 
+                            className={classes.menuButton} 
+                            color="inherit" 
+                            aria-label="menu"
+                            onClick={() => props.setMenuOpen(true)}
+                        >
                             <MenuIcon />
                         </IconButton>
                     }

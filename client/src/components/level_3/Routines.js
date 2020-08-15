@@ -38,19 +38,19 @@ export default function Routines() {
         }).catch((err)=>{
             alert(err);
         })
-    }, []);
+    }, [id]);
 
     return (
         <>
             <Grid container spacing={0}>
                 <Grid item xs={1}></Grid>
                 <Grid item xs={10}>
-                    <h2>
+                    <h3>
                         <Link to="/" className={classes.breadcrumb}>Home</Link>
                         /<Link to="/clients" className={classes.breadcrumb}>Client Management</Link>
                         /<Link to={`/clients/assets/${assetData.client._id}`} className={classes.breadcrumb}>Asset Management for {assetData.client.name}</Link>
                         /Routine Management for {assetData.name}
-                    </h2>
+                    </h3>
                 </Grid>
                 <Grid item xs={1}></Grid>
             </Grid>
@@ -59,7 +59,7 @@ export default function Routines() {
                 <Grid item xs={1}></Grid>
                 <Grid item xs={10}>
                     <Paper className={classes.paper}>
-                        <h1>Placeholder for routines</h1>
+                        <h1>Routines coming soon...</h1>
                     </Paper>
                 </Grid>
                 <Grid item xs={1}></Grid>

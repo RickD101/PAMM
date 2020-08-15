@@ -14,10 +14,12 @@ import Inventory from './components/level_1/Inventory';
 import Suppliers from './components/level_2/Suppliers';
 import Assets from './components/level_2/Assets';
 import Routines from './components/level_3/Routines';
+import MenuDrawer from './components/navigation/MenuDrawer';
 
 export default function App() {
 
-    const [loginStatus, setLoginStatus] = useState('false');
+    const [loginStatus, setLoginStatus] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
         getLoginStatus().then((status) => {
@@ -28,7 +30,8 @@ export default function App() {
     return (
         <Router>
 
-            <AppBarMenu loginStatus={loginStatus} setLoginStatus={setLoginStatus}/>
+            <AppBarMenu loginStatus={loginStatus} setLoginStatus={setLoginStatus} setMenuOpen={setMenuOpen}/>
+            <MenuDrawer menuOpen={menuOpen} setMenuOpen={setMenuOpen}/>
 
             {loginStatus ?   
                 <Switch>
