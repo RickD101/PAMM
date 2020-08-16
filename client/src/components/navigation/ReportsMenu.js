@@ -15,9 +15,7 @@ import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        width: '100%',
-        minWidth: 240,
-        maxWidth: 280,
+        width: '24%',
         overflowY: 'auto',
     },
     nested: {

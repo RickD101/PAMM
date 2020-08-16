@@ -33,13 +33,20 @@ const schema = new mongoose.Schema({
         type: String
     }],
     labour: [{
-        worker: String,
-        base_rate: Number,
+        worker: {
+            type: mongoose.Schema.Types.ObjectID,
+            ref: 'Worker'
+        },
+        rate: Number,
+        description: String,
+        hours: Number,
         multiplier: Number
     }],
     materials: [{
-        item: String,
-        description: String,
+        item: {
+            type: mongoose.Schema.Types.ObjectID,
+            ref: 'Item'
+        },
         cost: Number,
         quantity: Number
     }]

@@ -112,7 +112,7 @@ router.post('/read', async (req, res) => {
                 data = await Supplier.find();
                 break;
             case 'Worker':
-                data = await Worker.find().populate('user_profile');
+                data = await Worker.find().populate({path: 'user_profile', select: ['username', 'role']});
                 break;
             case 'Asset':
                 data = await Asset.find().populate('client');
@@ -121,7 +121,7 @@ router.post('/read', async (req, res) => {
                 data = await Routine.find().populate('asset');
                 break;
             case 'WorkOrder':
-                data = await WorkOrder.find().populate(['client', 'asset']);
+                data = await WorkOrder.find().populate(['client', 'asset', 'labour.worker', 'materials.item']);
         }
 
         if (!data) {
@@ -337,7 +337,7 @@ router.post('/findOne', async (req, res) => {
             case 'Worker':
                 data = await Worker.findOne({
                     _id: req.body.id
-                }).populate('user_profile');
+                }).populate({path: 'user_profile', select: ['username', 'role']});
                 break;
             case 'Asset':
                 data = await Asset.findOne({
@@ -352,7 +352,7 @@ router.post('/findOne', async (req, res) => {
             case 'WorkOrder':
                 data = await WorkOrder.findOne({
                     _id: req.body.id
-                }).populate(['client', 'asset']);
+                }).populate(['client', 'asset', 'labour.worker', 'materials.item']);
                 break;
         }
 
@@ -390,7 +390,7 @@ router.post('/find', async (req, res) => {
                 data = await Supplier.find(req.body.searchFields);
                 break;
             case 'Worker':
-                data = await Worker.find(req.body.searchFields).populate('user_profile');
+                data = await Worker.find(req.body.searchFields).populate({path: 'user_profile', select: ['username', 'role']});
                 break;
             case 'Asset':
                 data = await Asset.find(req.body.searchFields).populate('client');
@@ -399,7 +399,7 @@ router.post('/find', async (req, res) => {
                 data = await Routine.find(req.body.searchFields).populate('asset');
                 break;
             case 'WorkOrder':
-                data = await WorkOrder.find(req.body.searchFields).populate(['client', 'asset']);
+                data = await WorkOrder.find(req.body.searchFields).populate(['client', 'asset', 'labour.worker', 'materials.item']);
         }
 
         if (!data) {

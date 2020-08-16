@@ -16,12 +16,13 @@ const useStyles = makeStyles((theme) => ({
         textDecoration: 'none',
     },
     reportWindow: {
-        padding: theme.spacing(2),
+        padding: '8px 16px',
         textAlign: 'center',
         height: 600,
+        width: '76%',
         color: theme.palette.text.secondary,
-        background: 'lightgrey',
-        flexGrow: 1,
+        background: 'whitesmoke',
+        overflowY: 'auto'
     },
 }));
 

@@ -47,7 +47,7 @@ const tableIcons = {
 
 export default function MaterialTableComponent(props) {
 
-    const handleRowUpdate = async (newData, oldData, resolve) => {
+    const handleRowUpdate = async (newData, oldData, resolve, reject) => {
         try {
             const response = await updateCRUD({
                 model: props.model,
@@ -72,11 +72,11 @@ export default function MaterialTableComponent(props) {
         }
         catch (err) {
             alert(err);
-            resolve();
+            reject();
         }
     }
 
-    const handleRowAdd = async (newData, resolve) => {
+    const handleRowAdd = async (newData, resolve, reject) => {
         try {
             if (props.additionalFields){
                 newData = {...newData, ...props.additionalFields}
@@ -103,11 +103,11 @@ export default function MaterialTableComponent(props) {
         }
         catch (err) {
             alert(err);
-            resolve();
+            reject();
         }
     }
 
-    const handleRowDelete = async (oldData, resolve) => {
+    const handleRowDelete = async (oldData, resolve, reject) => {
         try {
             const response = await deleteCRUD({
                 model: props.model,
@@ -131,11 +131,11 @@ export default function MaterialTableComponent(props) {
         }
         catch (err) {
             alert(err);
-            resolve();
+            reject();
         }
     }
 
-    const handleBulkDelete = async (data, resolve) => {
+    const handleBulkDelete = async (data, resolve, reject) => {
         try {
             const deleteIDs = [];
             await Promise.all(
@@ -166,7 +166,7 @@ export default function MaterialTableComponent(props) {
         }
         catch (err) {
             alert(err);
-            resolve();
+            reject();
         }
     }
 
@@ -181,16 +181,16 @@ export default function MaterialTableComponent(props) {
                     icons={tableIcons}
                     editable={{
                         onRowUpdate: (newData, oldData) =>
-                            new Promise((resolve) => {
-                                handleRowUpdate(newData, oldData, resolve);
+                            new Promise((resolve, reject) => {
+                                handleRowUpdate(newData, oldData, resolve, reject);
                             }),
                         onRowAdd: (newData) =>
-                            new Promise((resolve) => {
-                                handleRowAdd(newData, resolve);
+                            new Promise((resolve,reject) => {
+                                handleRowAdd(newData, resolve, reject);
                             }),
                         onRowDelete: (oldData) =>
-                            new Promise((resolve) => {
-                                handleRowDelete(oldData, resolve);
+                            new Promise((resolve, reject) => {
+                                handleRowDelete(oldData, resolve, reject);
                             }),
                     }}
                     options={{
@@ -203,8 +203,8 @@ export default function MaterialTableComponent(props) {
                             tooltip: `Remove All Selected ${props.model}s?`,
                             icon: tableIcons.Delete,
                             onClick: (evt, data) =>
-                                new Promise((resolve) => {
-                                    handleBulkDelete(data, resolve);
+                                new Promise((resolve, reject) => {
+                                    handleBulkDelete(data, resolve, reject);
                                 }),
                         }
                     ]}
