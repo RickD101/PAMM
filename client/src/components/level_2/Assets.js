@@ -79,7 +79,7 @@ export default function Assets() {
                 columns={columns}
                 data={data}
                 setData={setData}
-                pageSize={6}
+                pageSize={10}
                 additionalFields = {{client: clientData._id}}
             />
         </>

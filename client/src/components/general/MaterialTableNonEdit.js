@@ -40,39 +40,7 @@ const tableIcons = {
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
-export default function MaterialTableNonApi(props) {
-
-    const handleRowUpdate = (newData, oldData, resolve) => {
-        const dataUpdate = [...props.data];
-        const index = oldData.tableData.id;
-        dataUpdate[index] = newData;
-        props.setData([...dataUpdate]);
-        resolve();
-    }
-
-    const handleRowAdd = (newData, resolve) => {
-        const dataToAdd = [...props.data];
-        dataToAdd.push(newData);
-        props.setData(dataToAdd);
-        resolve();
-    }
-
-    const handleRowDelete = (oldData, resolve) => {
-        const dataDelete = [...props.data];
-        const index = oldData.tableData.id;
-        dataDelete.splice(index, 1);
-        props.setData([...dataDelete]);
-        resolve();
-    }
-
-    const handleBulkDelete = async (data, resolve) => {
-        let dataDelete = [...props.data];
-        data.forEach(selection => {
-            dataDelete = dataDelete.filter(entry => entry.id !== selection.id);
-        });
-        props.setData([...dataDelete]);
-        resolve();
-    }
+export default function MaterialTableNonEdit(props) {
 
     return (
         <Grid container spacing={0}>
@@ -82,35 +50,13 @@ export default function MaterialTableNonApi(props) {
                     columns={props.columns}
                     data={props.data}
                     icons={tableIcons}
-                    editable={{
-                        onRowUpdate: (newData, oldData) =>
-                            new Promise((resolve) => {
-                                handleRowUpdate(newData, oldData, resolve);
-                            }),
-                        onRowAdd: (newData) =>
-                            new Promise((resolve) => {
-                                handleRowAdd(newData, resolve);
-                            }),
-                        onRowDelete: (oldData) =>
-                            new Promise((resolve) => {
-                                handleRowDelete(oldData, resolve);
-                            }),
-                    }}
                     options={{
                         pageSize: props.pageSize,
                         pageSizeOptions: [],
-                        selection: true
+                        selection: false,
+                        padding: 'dense',
+                        draggable: false
                     }}
-                    actions={[
-                        {
-                            tooltip: `Remove All Selected ${props.model}s?`,
-                            icon: tableIcons.Delete,
-                            onClick: (evt, data) =>
-                                new Promise((resolve) => {
-                                    handleBulkDelete(data, resolve);
-                                }),
-                        }
-                    ]}
                 />
             </Grid>
         </Grid>

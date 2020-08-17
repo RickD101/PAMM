@@ -43,21 +43,18 @@ const useStyles = makeStyles((theme) => ({
     step: {
         borderBottom: 'solid darkgrey 1px'
     },
-    workerField: {
-        width: '45%',
+    itemField: {
+        width: '60%',
         paddingRight: 12,
         marginBottom: 4
     },
-    rateField: {
+    costField: {
         width: '16%',
         paddingRight: 12
     },
-    hoursField: {
+    quantityField: {
         width: '16%',
         paddingRight: 12
-    },
-    multiField: {
-        width: '16%'
     },
     costDisplay: {
         display: 'inline-block',
@@ -66,38 +63,37 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function LabourTab(props) {
+export default function MaterialsTab(props) {
     const classes = useStyles();
     const blank = {
-        worker: '',
-        name: '',
-        rate: '',
-        hours: '',
-        multiplier: ''
+        item: '',
+        description: '',
+        cost: '',
+        quantity: ''
     }
 
     const [addEntryOpen, setAddEntryOpen] = useState(false);
     const [addEntryData, setAddEntryData] = useState(blank);
 
     const saveEntryData = () => {
-        const labour = [...props.labour];
-        labour.push(addEntryData);
-        props.setLabour(labour);
+        const materials = [...props.materials];
+        materials.push(addEntryData);
+        props.setMaterials(materials);
 
         const cost = {...props.cost};
-        cost.labourCost += addEntryData.hours*addEntryData.rate*addEntryData.multiplier;
+        cost.materialsCost += parseFloat((addEntryData.cost*addEntryData.quantity).toFixed(2));
         props.setCost(cost);
 
         setAddEntryData(blank);
     }
 
     const deleteEntry = (index) => {
-        const labour = [...props.labour];
-        const removedData = labour.splice(index, 1);
-        props.setLabour(labour);
+        const materials = [...props.materials];
+        const removedData = materials.splice(index, 1);
+        props.setMaterials(materials);
 
         const cost = {...props.cost};
-        cost.labourCost -= removedData[0].hours*removedData[0].rate*removedData[0].multiplier;
+        cost.materialsCost -= parseFloat((removedData[0].cost*removedData[0].quantity).toFixed(2));
         props.setCost(cost);
     }
 
@@ -109,11 +105,11 @@ export default function LabourTab(props) {
         setAddEntryData({ ...addEntryData, [event.target.name]: event.target.value });
     }
 
-    const handleWorkerChange = (event) => {
+    const handleItemChange = (event) => {
         const newAddEntryData = {...addEntryData};
         newAddEntryData[event.target.name] = event.target.value;
-        newAddEntryData.rate = event.currentTarget.getAttribute('rate');
-        newAddEntryData.name = event.currentTarget.getAttribute('actual_name');
+        newAddEntryData.cost = event.currentTarget.getAttribute('cost');
+        newAddEntryData.description = event.currentTarget.getAttribute('description');
         setAddEntryData(newAddEntryData);
     }
 
@@ -124,78 +120,53 @@ export default function LabourTab(props) {
                     ?
                     <ListSubheader className={classes.listHeader}>
                         <FormGroup row className={classes.addEntryBox}>
-                            <FormControl className={classes.workerField}>
-                                <InputLabel shrink id="workerField-label">
-                                    Worker
+                            <FormControl className={classes.itemField}>
+                                <InputLabel shrink id="itemField-label">
+                                    Item
                                 </InputLabel>
                                 <Select
-                                    labelId="workerField-label"
-                                    id="workerField"
-                                    name="worker"
-                                    value={addEntryData.worker}
-                                    onChange={handleWorkerChange}
+                                    labelId="itemField-label"
+                                    id="itemField"
+                                    name="item"
+                                    value={addEntryData.item}
+                                    onChange={handleItemChange}
                                     displayEmpty
                                 >
                                     <MenuItem value="">
                                         <em>(select)</em>
                                     </MenuItem>
-                                    {props.workerData &&
-                                    props.workerData.map((worker) => (
+                                    {props.itemData &&
+                                    props.itemData.map((item) => (
                                         <MenuItem 
-                                            key={worker._id} 
-                                            value={worker._id}
-                                            rate={worker.base_rate}
-                                            actual_name={worker.name}
+                                            key={item._id} 
+                                            value={item._id}
+                                            cost={item.cost}
+                                            description={item.description}
                                         >
-                                            {worker.name}
+                                            {item.description}
                                         </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
-                            <FormControl className={classes.rateField}>
-                                <InputLabel htmlFor="rateField">Base rate</InputLabel>
+                            <FormControl className={classes.costField}>
+                                <InputLabel htmlFor="costField">Cost per unit</InputLabel>
                                 <Input
-                                    id="rateField"
-                                    name="rate"
+                                    id="costField"
+                                    name="cost"
                                     startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                    value={addEntryData.rate}
+                                    value={addEntryData.cost}
                                     onChange={handleChange}
                                 />
                             </FormControl>
-                            <FormControl className={classes.hoursField}>
-                                <InputLabel htmlFor="hoursField">Hours</InputLabel>
+                            <FormControl className={classes.quantityField}>
+                                <InputLabel htmlFor="quantityField">Quantity</InputLabel>
                                 <Input
-                                    id="hoursField"
-                                    name="hours"
+                                    id="quantityField"
+                                    name="quantity"
                                     placeholder="0"
-                                    value={addEntryData.hours}
+                                    value={addEntryData.quantity}
                                     onChange={handleChange}
                                 />
-                            </FormControl>
-                            <FormControl className={classes.multiField}>
-                                <InputLabel shrink id="multiplierField-label">
-                                    Multiplier
-                                </InputLabel>
-                                <Select
-                                    labelId="multiplierField-label"
-                                    id="multiplierField"
-                                    name="multiplier"
-                                    value={addEntryData.multiplier}
-                                    onChange={handleChange}
-                                    displayEmpty
-                                >
-                                    <MenuItem value="">
-                                        <em>(select)</em>
-                                    </MenuItem>
-                                    {[1, 1.5, 2].map((multi) => (
-                                        <MenuItem 
-                                            key={`multi-${multi}`} 
-                                            value={multi}
-                                        >
-                                            {multi} ×
-                                        </MenuItem>
-                                    ))}
-                                </Select>
                             </FormControl>
                         </FormGroup>
                         <ListItemSecondaryAction>
@@ -224,16 +195,16 @@ export default function LabourTab(props) {
                                 startIcon={<AddCircleIcon />}
                                 onClick={() => setAddEntryOpen(true)}
                             >
-                                Add labour
+                                Add item
                             </Button>
                         </ListItemSecondaryAction>
                     </ListSubheader>
                 }
-                {props.labour &&
-                props.labour.map((entry, index) => {
+                {props.materials &&
+                props.materials.map((entry, index) => {
                     return(
                         <ListItem key={`entry-${index+1}`} dense className={classes.step}>
-                            <ListItemText>{entry.name} worked for {parseFloat(entry.hours).toFixed(2)} hours at ${parseFloat(entry.rate).toFixed(2)} p/h × {entry.multiplier} totalling ${(entry.hours*entry.rate*entry.multiplier).toFixed(2)}</ListItemText>
+                            <ListItemText>{entry.description}: {entry.quantity} @ ${parseFloat(entry.cost).toFixed(2)} totalling ${parseFloat(entry.cost*entry.quantity).toFixed(2)}</ListItemText>
                             <ListItemSecondaryAction>
                                 <IconButton onClick={() => editEntry(index)}>
                                     <EditIcon fontSize="small" />

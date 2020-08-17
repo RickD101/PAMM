@@ -20,6 +20,7 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/picker
 // inclusions
 import readCRUD from '../../api/crud/readCRUD';
 import TabContainer from './TabContainer';
+import createCRUD from '../../api/crud/createCRUD';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -75,8 +76,7 @@ Date.prototype.yyyymmdd = function() {
 
 export default function NewWorkOrder(props) {
     const classes = useStyles();
-
-    const [formState, setFormState] = useState({
+    const blank = {
         client: '',
         asset: '',
         active: false,
@@ -84,13 +84,16 @@ export default function NewWorkOrder(props) {
         description: 'Add work description here',
         expected_completion: new Date().yyyymmdd(),
         actual_completion: new Date().yyyymmdd(),
-        procedure: [],
-        materials: [],
-        labour: [],
-    });
+    }
+
+    const [formState, setFormState] = useState(blank);
     const [procedure, setProcedure] = useState([]);
     const [labour, setLabour] = useState([]);
     const [materials, setMaterials] = useState([]);
+    const [cost, setCost] = useState({
+        labourCost: 0,
+        materialsCost: 0,
+    })
 
     const [clientData, setClientData] = useState([]);
     const [assetData, setAssetData] = useState([]);
@@ -126,6 +129,43 @@ export default function NewWorkOrder(props) {
         })
     }, []);
 
+    const saveForm = async () => {
+        try {
+            const response = await createCRUD({
+                model: 'WorkOrder',
+                data: {
+                    ...formState, 
+                    procedure: procedure, 
+                    labour: labour, 
+                    materials: materials
+                }
+            });
+            if (response) {
+                if (response.status) {
+                    resetForm();
+                    alert(response.msg);
+                }
+                else {
+                    throw new Error(`${response.msg}`);
+                }
+            }
+            else {
+                throw new Error(`The server failed to respond.`);
+            }
+        }
+        catch (err) {
+            alert(err);
+        }
+    }
+
+    const resetForm = () => {
+        setFormState(blank);
+        setProcedure([]);
+        setLabour([]);
+        setMaterials([]);
+        setCost({labourCost: 0, materialsCost: 0,});
+    }
+
     const handleChange = (event) => {
         setFormState({ ...formState, [event.target.name]: event.target.value });
     };
@@ -138,7 +178,19 @@ export default function NewWorkOrder(props) {
     }
 
     const handleCheckboxChange = (event) => {
-        setFormState({ ...formState, [event.target.name]: event.target.checked });
+        if (event.target.name === 'active' && formState.completed) {
+            if (!formState.active) {
+                setFormState({ ...formState, active: true, completed: false });
+            }
+        }
+        else if (event.target.name === 'completed' && formState.active) {
+            if (!formState.completed) {
+                setFormState({ ...formState, completed: true, active: false });
+            }
+        }
+        else {
+            setFormState({ ...formState, [event.target.name]: event.target.checked });
+        }
     }
 
     const handleECDateChange = (date) => {
@@ -167,6 +219,7 @@ export default function NewWorkOrder(props) {
                     color="primary"
                     className={classes.button}
                     startIcon={<SaveIcon />}
+                    onClick={saveForm}
                 >
                     Save
                 </Button>
@@ -175,8 +228,9 @@ export default function NewWorkOrder(props) {
                     color="secondary"
                     className={classes.button}
                     startIcon={<DeleteIcon />}
+                    onClick={resetForm}
                 >
-                    Discard
+                    Clear
                 </Button>
             </Grid>
         </Grid>
@@ -339,6 +393,8 @@ export default function NewWorkOrder(props) {
                 materials={materials}
                 setMaterials={setMaterials}
                 itemData={itemData}
+                cost={cost}
+                setCost={setCost}
             />   
         </Grid>
         </>

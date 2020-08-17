@@ -61,7 +61,7 @@ export default function Suppliers() {
                 columns={columns}
                 data={data}
                 setData={setData}
-                pageSize={5}
+                pageSize={10}
             />
         </>
     )

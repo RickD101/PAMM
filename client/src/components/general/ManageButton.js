@@ -10,6 +10,7 @@ export default function ManageButton(props) {
             <Button
                 variant="contained"
                 color="primary"
+                size="small"
                 endIcon={<SubdirectoryArrowRightIcon />}
             >
                 Manage

@@ -69,7 +69,7 @@ export default function Clients() {
                 columns={columns}
                 data={data}
                 setData={setData}
-                pageSize={6}
+                pageSize={10}
             />
         </>
     )

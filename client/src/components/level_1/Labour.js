@@ -58,7 +58,7 @@ export default function Labour() {
                 columns={columns}
                 data={data}
                 setData={setData}
-                pageSize={8}
+                pageSize={12}
             />
         </>
     )

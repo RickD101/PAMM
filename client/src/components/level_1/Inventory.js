@@ -82,11 +82,11 @@ export default function Inventory() {
 
             <MaterialTableComponent 
                 model={'Item'}
-                title={'Inventory in Stock'}
+                title={'Inventory in stock'}
                 columns={columns}
                 data={data}
                 setData={setData}
-                pageSize={6}
+                pageSize={8}
             />
 
             <Grid container spacing={0}>

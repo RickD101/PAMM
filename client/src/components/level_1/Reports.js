@@ -54,7 +54,7 @@ export default function Clients() {
                 <Grid item xs={10}>
                     <Paper elevation={3}>
                         <Grid container>
-                            <ReportsMenu setWindowState={setWindowState}/>
+                            <ReportsMenu windowState={windowState} setWindowState={setWindowState}/>
                             <Grid item className={classes.reportWindow}>
                                 {windowState === 'blank' &&
                                     <h1 style={{marginTop: 250}}>Select an option</h1>

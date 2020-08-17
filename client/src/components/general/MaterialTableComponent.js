@@ -196,7 +196,8 @@ export default function MaterialTableComponent(props) {
                     options={{
                         pageSize: props.pageSize,
                         pageSizeOptions: [],
-                        selection: true
+                        selection: true,
+                        padding: 'dense'
                     }}
                     actions={[
                         {

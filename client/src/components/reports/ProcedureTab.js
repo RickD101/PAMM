@@ -14,6 +14,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import TextField from '@material-ui/core/TextField';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,7 +37,12 @@ const useStyles = makeStyles((theme) => ({
     },
     step: {
         borderBottom: 'solid darkgrey 1px'
-    }
+    },
+    titleField: {
+        display: 'inline-block',
+        color: 'black',
+        marginLeft: '3%'
+    },
 }));
 
 export default function ProcedureTab(props) {
@@ -107,7 +113,7 @@ export default function ProcedureTab(props) {
                     </ListSubheader>
                     :
                     <ListSubheader className={classes.listHeader}>
-                        Detailed work procedure
+                        <Typography align="center" className={classes.titleField}>Detailed work procedure:</Typography>
                         <ListItemSecondaryAction>
                             <Button
                                 variant="contained"

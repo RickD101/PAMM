@@ -90,9 +90,16 @@ router.post('/create', async (req, res) => {
         }
     }
     catch (err) {
+        let error = err
+        if (err._message) {
+            error = err._message;
+        }
+        else {
+            error = 'Some required fields are missing.'
+        }
         res.status(400).send({
             status: false,
-            msg: err._message
+            msg: error
         });
     }
 });

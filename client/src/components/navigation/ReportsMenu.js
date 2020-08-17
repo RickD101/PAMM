@@ -21,6 +21,10 @@ const useStyles = makeStyles((theme) => ({
     nested: {
         paddingLeft: theme.spacing(4),
     },
+    nestedActive: {
+        paddingLeft: theme.spacing(4),
+        backgroundColor: 'whitesmoke'
+    },
 }));
 
 export default function ReportsMenu(props) {
@@ -34,6 +38,15 @@ export default function ReportsMenu(props) {
         openSetting[select] = !openSetting[select]
         setOpen(openSetting);
     };
+
+    const isActiveClass = (name) => {
+        if (name === props.windowState) {
+            return classes.nestedActive
+        }
+        else {
+            return classes.nested
+        }
+    }
 
     return (
         <List
@@ -54,7 +67,7 @@ export default function ReportsMenu(props) {
                 <List component="div" disablePadding>
                     <ListItem 
                         button 
-                        className={classes.nested}
+                        className={isActiveClass('newWorkOrder')}
                         onClick={() => props.setWindowState('newWorkOrder')}
                     >
                         <ListItemIcon>
@@ -64,7 +77,7 @@ export default function ReportsMenu(props) {
                     </ListItem>
                     <ListItem 
                         button 
-                        className={classes.nested}
+                        className={isActiveClass('manageWorkOrders')}
                         onClick={() => props.setWindowState('manageWorkOrders')}
                     >
                         <ListItemIcon>
@@ -73,8 +86,8 @@ export default function ReportsMenu(props) {
                         <ListItemText primary="Manage work orders" />
                     </ListItem>
                     <ListItem 
-                        button 
-                        className={classes.nested}
+                        button
+                        className={isActiveClass('workOrderSummary')}
                         onClick={() => props.setWindowState('workOrderSummary')}
                     >
                         <ListItemIcon>

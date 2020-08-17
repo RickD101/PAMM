@@ -7,6 +7,7 @@ import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 import ProcedureTab from './ProcedureTab';
 import LabourTab from './LabourTab';
+import MaterialsTab from './MaterialsTab';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -68,10 +69,22 @@ export default function TabContainer(props) {
                     <Tab label="Procedure" {...a11yProps(2)} />
                 </Tabs>
             <TabPanel value={value} index={0}>
-                <LabourTab labour={props.labour} setLabour={props.setLabour} workerData={props.workerData}/> 
+                <LabourTab 
+                    labour={props.labour} 
+                    setLabour={props.setLabour} 
+                    workerData={props.workerData} 
+                    cost={props.cost} 
+                    setCost={props.setCost}
+                /> 
             </TabPanel>
             <TabPanel value={value} index={1}>
-                Materials
+                <MaterialsTab 
+                    materials={props.materials} 
+                    setMaterials={props.setMaterials} 
+                    itemData={props.itemData} 
+                    cost={props.cost} 
+                    setCost={props.setCost}
+                />
             </TabPanel>
             <TabPanel value={value} index={2}>
                 <ProcedureTab procedure={props.procedure} setProcedure={props.setProcedure}/>
