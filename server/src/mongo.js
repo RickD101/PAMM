@@ -1,6 +1,8 @@
+// inclusions
 const mongoose = require('mongoose');
+const consts  = require('./consts');
 
-mongoose.connect('mongodb://localhost:27017/PAMM', {
+mongoose.connect(`mongodb://localhost:27017/${consts.dbName}`, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -8,13 +10,13 @@ mongoose.connect('mongodb://localhost:27017/PAMM', {
 });
 
 mongoose.connection.on('connected', () => {
-    console.log('Mongoose connected.')
+    console.log(`Mongoose connected to ${consts.dbName}`)
 });
   
 mongoose.connection.on('error', (err) => {
-    console.log(err, 'Mongoose failed to connect.')
+    console.log(err, 'Mongoose failed to connect')
 });
 
 mongoose.connection.on('disconncted', () => {
-    console.log('Mongoose disconnected.')
+    console.log('Mongoose disconnected')
 });

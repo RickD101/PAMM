@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-    client: {
+    owner: {
         type: mongoose.Schema.Types.ObjectID,
-        ref: 'Client',
+        refPath: 'ownerModel',
         required: true
     },
-    asset: {
-        type: mongoose.Schema.Types.ObjectID,
-        ref: 'Asset',
-        required: true
+    ownerModel: {
+        type: String,
+        required: true,
+        enum: ['Asset', 'Component'] 
     },
-    expected_completion: {
-        type: Date,
+    description: {
+        type: String,
         required: true
     },
     active: {
@@ -23,18 +23,23 @@ const schema = new mongoose.Schema({
         type: Boolean,
         required: true
     },
+    expected_completion: {
+        type: Date,
+        required: true
+    },
     actual_completion: {
         type: Date
     },
-    description: {
-        type: String
+    scheduled: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Routine'
     },
     procedure: [{
         type: String
     }],
     labour: [{
         worker: {
-            type: mongoose.Schema.Types.ObjectID,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'Worker'
         },
         name: String,

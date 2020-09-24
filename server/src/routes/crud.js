@@ -1,5 +1,14 @@
+// package inclusions
 const express = require('express');
 const router = express.Router();
+
+// functional inclusions
+const createFn  = require('./nested_functions/create');
+const readFn    = require('./nested_functions/read');
+const updateFn  = require('./nested_functions/update');
+const deleteFn  = require('./nested_functions/delete');
+const findOneFn = require('./nested_functions/findOne');
+const findFn    = require('./nested_functions/find');
 
 // model inclusions
 const Client    = require('../models/Client');
@@ -7,7 +16,9 @@ const Item      = require('../models/Item');
 const Supplier  = require('../models/Supplier');
 const Worker    = require('../models/Worker');
 const Asset     = require('../models/Asset');
+const Component = require('../models/Component');
 const Routine   = require('../models/Routine');
+const Procedure = require('../models/Procedure');
 const WorkOrder = require('../models/WorkOrder');
 
 // auth check
@@ -26,119 +37,38 @@ router.use((req, res, next) => {
 // CREATE route
 router.post('/create', async (req, res) => {
     try {
-        let data;
-        switch (req.body.model) {
-            case 'Client':
-                data = await Client.create(req.body.data);
-                break;
-            case 'Item':
-                data = await Item.create(req.body.data);
-                break;
-            case 'Supplier':
-                data = await Supplier.create(req.body.data);
-                break;
-            case 'Worker':
-                data = await Worker.create(req.body.data);
-                break;
-            case 'Asset':
-                let findClient = await Client.findOne({
-                    _id: req.body.data.client
-                });
-                if (findClient) {
-                    data = await Asset.create(req.body.data);
-                }
-                else {
-                    throw new Error({_message: 'Associated client not found.'});
-                }
-                break;
-            case 'Routine':
-                let findAsset = await Asset.findOne({
-                    _id: req.body.data.asset
-                });
-                if (findAsset) {
-                    data = await Routine.create(req.body.data);
-                }
-                else {
-                    throw new Error({_message: 'Associated asset not found.'});
-                }
-                break;
-            case 'WorkOrder':
-                let findClientWO = await Client.findOne({
-                    _id: req.body.data.client
-                });
-                let findAssetWO = await Asset.findOne({
-                    _id: req.body.data.asset
-                });
-                if (findAssetWO && findClientWO) {
-                    data = await WorkOrder.create(req.body.data);
-                }
-                else {
-                    throw new Error({_message: 'Associated client or asset not found.'});
-                }
-                break;
-        }
+        const data = await createFn(req.body);
 
         if (data) {
             res.send({
                 status: true,
-                msg: req.body.model + ' saved to database.',
+                msg: req.body.model + ' saved.',
                 id: data._id
             });
+            console.log('\n', `${req.body.model} saved by ${req.session.user.username}:`)
+            console.log(data);
         }
         else {
-            throw new Error({_message: 'No matching model found.'});
+            throw {message: 'A database error has occurred.'};
         }
     }
     catch (err) {
-        let error = err
-        if (err._message) {
-            error = err._message;
-        }
-        else {
-            error = 'Some required fields are missing.'
-        }
-        res.status(400).send({
-            status: false,
-            msg: error
-        });
+        sendError(err, res);
     }
 });
 
 // READ route
 router.post('/read', async (req, res) => {
     try {
-        let data;
-        switch (req.body.model) {
-            case 'Client':
-                data = await Client.find();
-                break;
-            case 'Item':
-                data = await Item.find().populate('supplier');
-                break;
-            case 'Supplier':
-                data = await Supplier.find();
-                break;
-            case 'Worker':
-                data = await Worker.find().populate({path: 'user_profile', select: ['username', 'role']});
-                break;
-            case 'Asset':
-                data = await Asset.find().populate('client');
-                break;
-            case 'Routine':
-                data = await Routine.find().populate('asset');
-                break;
-            case 'WorkOrder':
-                data = await WorkOrder.find().populate(['client', 'asset', 'labour.worker', 'materials.item']);
-        }
-
+        const data = await readFn(req.body);
+        
         if (!data) {
-            throw new Error({_message: 'No matching model found.'});
+            throw {message: 'A database error has occurred.'};
         }
         else if (!data[0]) {
             res.send({
                 status: false,
-                msg: `No ${req.body.model}s found.`,
-                data: data
+                msg: `No ${req.body.model}s found.`
             });
         }
         else if (data) {
@@ -150,218 +80,65 @@ router.post('/read', async (req, res) => {
         }
     }
     catch (err) {
-        res.status(400).send({
-            status: false,
-            msg: err._message
-        });
+        sendError(err, res);
     }
 });
 
 // UPDATE route
 router.patch('/update', async (req, res) => {
     try {
-        let data;
-        switch (req.body.model) {
-            case 'Client':
-                data = await Client.findOneAndUpdate(
-                    {
-                        _id: req.body.id
-                    },
-                    req.body.data,
-                    {new: true}
-                );
-                break;
-            case 'Item':
-                data = await Item.findOneAndUpdate(
-                    {
-                        _id: req.body.id
-                    },
-                    req.body.data,
-                    {new: true}
-                );
-                break;
-            case 'Supplier':
-                data = await Supplier.findOneAndUpdate(
-                    {
-                        _id: req.body.id
-                    },
-                    req.body.data,
-                    {new: true}
-                );
-                break;
-            case 'Worker':
-                data = await Worker.findOneAndUpdate(
-                    {
-                        _id: req.body.id
-                    },
-                    req.body.data,
-                    {new: true}
-                );
-                break;
-            case 'Asset':
-                data = await Asset.findOneAndUpdate(
-                    {
-                        _id: req.body.id
-                    },
-                    req.body.data,
-                    {new: true}
-                );
-                break;
-            case 'Routine':
-                data = await Routine.findOneAndUpdate(
-                    {
-                        _id: req.body.id
-                    },
-                    req.body.data,
-                    {new: true}
-                );
-                break;
-            case 'WorkOrder':
-                data = await WorkOrder.findOneAndUpdate(
-                    {
-                        _id: req.body.id
-                    },
-                    req.body.data,
-                    {new: true}
-                );
-                break;
-        }
+        const data = await updateFn(req.body)
 
         if (data) {
             res.send({
                 status: true,
-                msg: req.body.model + ' updated.'
+                msg: req.body.model + ' updated.',
+                id: data.id
             });
+            console.log('\n', `${req.body.model} updated by ${req.session.user.username}:`)
+            console.log(data);
+        }
+        else if (data === null) {
+            throw {message: `No ${req.body.model} with id: ${req.body.id} was found to update.`}
         }
         else {
-            throw new Error({_message: 'No matching model found.'});
+            throw {message: 'A database error has occurred.'};
         }
     }
     catch (err) {
-        res.status(400).send({
-            status: false,
-            msg: err._message
-        });
+        sendError(err, res);
     }
 });
 
 // DELETE route
 router.delete('/delete', async (req, res) => {
     try {
-        let data;
-        switch (req.body.model) {
-            case 'Client':
-                const assocAssets = await Asset.find({
-                    client: req.body.id
-                });
-                await Promise.all(
-                    assocAssets.map(async (asset) => {
-                        await Routine.deleteMany({
-                            asset: asset._id
-                        });
-                    })
-                );
-                await Asset.deleteMany({
-                    client: req.body.id
-                })
-                data = await Client.findOneAndDelete({
-                    _id: req.body.id
-                });
-                break;
-            case 'Item':
-                data = await Item.findOneAndDelete({
-                    _id: req.body.id
-                });
-                break;
-            case 'Supplier':
-                data = await Supplier.findOneAndDelete({
-                    _id: req.body.id
-                });
-                break;
-            case 'Worker':
-                data = await Worker.findOneAndDelete({
-                    _id: req.body.id
-                });
-                break;
-            case 'Asset':
-                await Routine.deleteMany({
-                    asset: req.body.id
-                })
-                data = await Asset.findOneAndDelete({
-                    _id: req.body.id
-                });
-                break;
-            case 'Routine':
-                data = await Routine.findOneAndDelete({
-                    _id: req.body.id
-                });
-                break;
-            case 'WorkOrder':
-                data = await WorkOrder.findOneAndDelete({
-                    _id: req.body.id
-                });
-                break;
-        }
+        const data = await deleteFn(req.body)
 
         if (data) {
             res.send({
                 status: true,
                 msg: req.body.model + ' deleted.'
             });
+            console.log('\n', `${req.body.model} deleted by ${req.session.user.username}:`)
+            console.log(data);
+        }
+        else if (data === null) {
+            throw {message: `No ${req.body.model} with id: ${req.body.id} was found to delete.`}
         }
         else {
-            throw new Error({_message: 'No matching model found.'});
+            throw {message: 'A database error has occurred.'};
         }
     }
     catch (err) {
-        res.status(400).send({
-            status: false,
-            msg: err._message
-        });
+        sendError(err, res);
     }
 });
 
-// Search for one by ID
+// Search by ID
 router.post('/findOne', async (req, res) => {
     try {
-        let data;
-        switch (req.body.model) {
-            case 'Client':
-                data = await Client.findOne({
-                    _id: req.body.id
-                });
-                break;
-            case 'Item':
-                data = await Item.findOne({
-                    _id: req.body.id
-                }).populate('supplier');
-                break;
-            case 'Supplier':
-                data = await Supplier.findOne({
-                    _id: req.body.id
-                });
-                break;
-            case 'Worker':
-                data = await Worker.findOne({
-                    _id: req.body.id
-                }).populate({path: 'user_profile', select: ['username', 'role']});
-                break;
-            case 'Asset':
-                data = await Asset.findOne({
-                    _id: req.body.id
-                }).populate('client');
-                break;
-            case 'Routine':
-                data = await Routine.findOne({
-                    _id: req.body.id
-                }).populate('asset');
-                break;
-            case 'WorkOrder':
-                data = await WorkOrder.findOne({
-                    _id: req.body.id
-                }).populate(['client', 'asset', 'labour.worker', 'materials.item']);
-                break;
-        }
+        const data = await findOneFn(req.body);
 
         if (data) {
             res.send({
@@ -370,53 +147,30 @@ router.post('/findOne', async (req, res) => {
                 data: data
             });
         }
+        else if (data === null) {
+            throw {message: `No ${req.body.model} with id: ${req.body.id} was found.`}
+        }
         else {
-            throw new Error({_message: `No matching ${req.body.model} found.`});
+            throw {message: 'A database error has occurred.'};
         }
     }
     catch (err) {
-        res.status(400).send({
-            status: false,
-            msg: err._message
-        });
+        sendError(err, res);
     }
 });
 
 // Search by field
 router.post('/find', async (req, res) => {
     try {
-        let data;
-        switch (req.body.model) {
-            case 'Client':
-                data = await Client.find(req.body.searchFields);
-                break;
-            case 'Item':
-                data = await Item.find(req.body.searchFields).populate('supplier');
-                break;
-            case 'Supplier':
-                data = await Supplier.find(req.body.searchFields);
-                break;
-            case 'Worker':
-                data = await Worker.find(req.body.searchFields).populate({path: 'user_profile', select: ['username', 'role']});
-                break;
-            case 'Asset':
-                data = await Asset.find(req.body.searchFields).populate('client');
-                break;
-            case 'Routine':
-                data = await Routine.find(req.body.searchFields).populate('asset');
-                break;
-            case 'WorkOrder':
-                data = await WorkOrder.find(req.body.searchFields).populate(['client', 'asset', 'labour.worker', 'materials.item']);
-        }
+        const data = await findFn(req.body);
 
         if (!data) {
-            throw new Error({_message: 'No matching model found.'});
+            throw {message: 'A database error has occurred.'};
         }
         else if (!data[0]) {
             res.send({
                 status: false,
-                msg: `No ${req.body.model}s found.`,
-                data: data
+                msg: `No ${req.body.model}s found.`
             });
         }
         else if (data) {
@@ -428,11 +182,22 @@ router.post('/find', async (req, res) => {
         }
     }
     catch (err) {
-        res.status(400).send({
-            status: false,
-            msg: err._message
-        });
+        sendError(err, res);
     }
 });
+
+const sendError = (err, res) => {
+    let error
+        if (err.message) {
+            error = err.message;
+        }
+        else {
+            error = 'A database error has occurred.'
+        }
+        res.status(400).send({
+            status: false,
+            msg: error
+        });
+}
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-    category: {
+    category: { // to be of category part or consumable
         type: String,
         required: true
     },
@@ -13,16 +13,18 @@ const schema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    code: {
-        type: String
-    },
     quantity: {
         type: Number
     },
     supplier: {
         type: mongoose.Schema.Types.ObjectID,
         ref: 'Supplier'
-    }
+    },
+    code: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
 });
 
 module.exports = mongoose.model('Item', schema);

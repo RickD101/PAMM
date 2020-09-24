@@ -1,24 +1,27 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-    asset: {
+    owner: {
         type: mongoose.Schema.Types.ObjectID,
-        ref: 'Asset',
+        refPath: 'ownerModel',
         required: true
     },
-    initial: {
+    ownerModel: {
+        type: String,
+        required: true,
+        enum: ['Asset', 'Component'] 
+    },
+    next_WO_gen: {
         type: Date,
         required: true
     },
-    frequency: {
+    freq_WO_gen: {
         type: String,
         required: true
     },
-    code: {
-        type: String
-    },
     description: {
-        type: String
+        type: String,
+        required: true
     },
     procedure: [{
         type: String

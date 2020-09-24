@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-    client: {
+    asset: {
         type: mongoose.Schema.Types.ObjectID,
-        ref: 'Client',
+        ref: 'Asset',
         required: true
     },
     name: {
         type: String,
-        required: true
+        requied: true
     },
     description: {
         type: String
@@ -20,4 +20,4 @@ const schema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Asset', schema);
+module.exports = mongoose.model('Component', schema);
