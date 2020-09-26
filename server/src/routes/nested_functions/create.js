@@ -89,12 +89,14 @@ const createFn = async (body) => {
             }
 
         case 'WorkOrder':
+            
             if (body.data.asset) {
                 let findAsset = await Asset.findOne({
                     _id: body.data.asset
                 });
+                
                 if (findAsset) {
-                    if (!completed && body.data.actual_completion) {
+                    if (!body.data.completed && body.data.actual_completion) {
                         delete body.data.actual_completion
                     }
                     body.data.owner = body.data.asset;
@@ -111,7 +113,7 @@ const createFn = async (body) => {
                     _id: body.data.component
                 });
                 if (findComponent) {
-                    if (!completed && body.data.actual_completion) {
+                    if (!body.data.completed && body.data.actual_completion) {
                         delete body.data.actual_completion
                     }
                     body.data.owner = body.data.component;

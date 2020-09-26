@@ -10,6 +10,11 @@ const deleteFn  = require('./nested_functions/delete');
 const findOneFn = require('./nested_functions/findOne');
 const findFn    = require('./nested_functions/find');
 
+// router.use((req, res, next) => {
+//     console.log(req.body);
+//     next();
+// });
+
 // CREATE route
 router.post('/create', async (req, res) => {
     try {
