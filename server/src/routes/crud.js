@@ -10,30 +10,6 @@ const deleteFn  = require('./nested_functions/delete');
 const findOneFn = require('./nested_functions/findOne');
 const findFn    = require('./nested_functions/find');
 
-// model inclusions
-const Client    = require('../models/Client');
-const Item      = require('../models/Item');
-const Supplier  = require('../models/Supplier');
-const Worker    = require('../models/Worker');
-const Asset     = require('../models/Asset');
-const Component = require('../models/Component');
-const Routine   = require('../models/Routine');
-const Procedure = require('../models/Procedure');
-const WorkOrder = require('../models/WorkOrder');
-
-// auth check
-router.use((req, res, next) => {
-    if (req.session.user) {
-        next();
-    }
-    else {
-        res.status(401).send({
-            status: false,
-            msg: 'Please login to access.'
-        });
-    }
-});
-
 // CREATE route
 router.post('/create', async (req, res) => {
     try {

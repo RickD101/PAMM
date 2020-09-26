@@ -10,6 +10,8 @@ const Procedure = require('../../models/Procedure');
 const WorkOrder = require('../../models/WorkOrder');
 
 const findFn = async (body) => {
+    makeRegexp(body.searchFields);
+    
     switch (body.model) {
         case 'Client':
             data = await Client.find(body.searchFields);
@@ -58,5 +60,21 @@ const findFn = async (body) => {
             throw {message: `No matching model found for ${body.model}.`};
     }
 }
+
+const makeRegexp = (obj) => {
+    
+    Object.keys(obj).map((key) => {
+        if (!idArray.includes(key)) {
+            if (typeof obj[key] === 'string') {
+                obj[key] = new RegExp(`${obj[key]}`, 'i');
+            }
+            else if (typeof obj[key] === 'object') {
+                makeRegexp(obj[key]);
+            }
+        }
+    })
+}
+
+const idArray = ['asset', 'client', 'supplier', 'owner', 'scheduled', 'user_profile', 'id', '_id']
 
 module.exports = findFn;

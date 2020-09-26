@@ -47,7 +47,9 @@ const readFn = async (body) => {
             return data;
 
         case 'WorkOrder':
-            data = await WorkOrder.find().populate(['owner', 'scheduled', 'labour.worker', 'materials.item']);
+            data = await WorkOrder.find().populate(
+                ['owner', 'scheduled', 'labour.worker', 'materials.item']
+            );
             return data;
 
         default:

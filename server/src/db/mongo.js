@@ -1,8 +1,8 @@
 // inclusions
 const mongoose = require('mongoose');
-const consts  = require('./consts');
+const consts  = require('../consts');
 
-mongoose.connect(`mongodb://localhost:27017/${consts.dbName}`, {
+mongoose.connect(`${consts.dbPath}${consts.dbName}`, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,

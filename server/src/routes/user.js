@@ -20,23 +20,6 @@ router.get('/', (req,res)=>{
     }
 });
 
-// login check middleware
-router.use((req,res,next)=>{
-    if (req.session.user){
-        if (req.path == '/logout' || req.path == '/delete'){
-            next();
-        }
-        else{
-            res.send({
-                msg: req.session.user.username + ' is already logged in.'
-            });
-        }
-    }
-    else{
-        next();
-    }
-});
-
 // new user route
 router.post('/new', async (req,res)=>{
     try{

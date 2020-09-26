@@ -7,7 +7,8 @@ const schema = new mongoose.Schema({
     },
     category: { // to be of category safety, work or other
         type: String,
-        required: true
+        required: true,
+        enum: ['safety', 'work', 'other']
     },
     procedure: [{
         type: String

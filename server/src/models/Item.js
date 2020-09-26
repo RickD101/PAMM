@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-    category: { // to be of category part or consumable
-        type: String,
-        required: true
-    },
     description: {
         type: String,
         required: true
+    },
+    category: {
+        type: String,
+        required: true,
+        enum: ['part', 'consumable', 'other']
     },
     cost: {
         type: Number,

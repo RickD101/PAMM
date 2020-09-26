@@ -20,12 +20,18 @@ const deleteFn = async (body) => {
                     await Routine.deleteMany({
                         owner: asset._id
                     });
+                    await WorkOrder.deleteMany({
+                        owner: asset._id
+                    })
                     const assocComponents = await Component.find({
                         asset: asset._id
                     })
                     await Promise.all(
                         assocComponents.map(async (component) => {
                             await Routine.deleteMany({
+                                owner: component._id
+                            });
+                            await WorkOrder.deleteMany({
                                 owner: component._id
                             });
                         })
@@ -71,6 +77,25 @@ const deleteFn = async (body) => {
             await Routine.deleteMany({
                 owner: body.id
             })
+            await WorkOrder.deleteMany({
+                owner: body._id
+            });
+            const assocComponents = await Component.find({
+                asset: body._id
+            })
+            await Promise.all(
+                assocComponents.map(async (component) => {
+                    await Routine.deleteMany({
+                        owner: component._id
+                    });
+                    await WorkOrder.deleteMany({
+                        owner: component._id
+                    });
+                })
+            )
+            await Component.deleteMany({
+                asset: asset._id
+            })
             data = await Asset.findOneAndDelete({
                 _id: body.id
             });
@@ -80,6 +105,9 @@ const deleteFn = async (body) => {
             await Routine.deleteMany({
                 owner: body.id
             })
+            await WorkOrder.deleteMany({
+                owner: body._id
+            });
             data = await Component.findOneAndDelete({
                 _id: body.id
             });
