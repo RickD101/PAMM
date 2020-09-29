@@ -1,8 +1,9 @@
 // inclusions
-const express = require('express');
-const session = require('express-session');
-const consts  = require('./consts');
-require('./db/mongo'); // server setup JS inclusion
+const express    = require('express');
+const session    = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+const consts     = require('./consts');
+const mongoose   = require('./db/mongo'); // server setup JS inclusion
 
 // set app
 const app = express();
@@ -17,7 +18,8 @@ app.use(express.json());        // middleware for JSON parsing
 app.use(session({               // session middleware
     secret: consts.key,
     resave: false,
-    saveUninitialized: false 
+    saveUninitialized: false,
+    store: new MongoStore({mongooseConnection: mongoose.connection})
 }));
 
 // auth check

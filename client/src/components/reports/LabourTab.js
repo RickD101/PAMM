@@ -20,6 +20,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { Typography } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -157,6 +158,7 @@ export default function LabourTab(props) {
                                 <Input
                                     id="rateField"
                                     name="rate"
+                                    readOnly
                                     startAdornment={<InputAdornment position="start">$</InputAdornment>}
                                     value={addEntryData.rate}
                                     onChange={handleChange}
@@ -167,6 +169,7 @@ export default function LabourTab(props) {
                                 <Input
                                     id="hoursField"
                                     name="hours"
+                                    type="number"
                                     placeholder="0"
                                     value={addEntryData.hours}
                                     onChange={handleChange}
@@ -199,16 +202,20 @@ export default function LabourTab(props) {
                             </FormControl>
                         </FormGroup>
                         <ListItemSecondaryAction>
-                            <IconButton
-                                onClick={() => {setAddEntryOpen(false); saveEntryData()}}
-                            >
-                                <DoneIcon />
-                            </IconButton>
-                            <IconButton
-                                onClick={() => {setAddEntryOpen(false); setAddEntryData(blank)}}
-                            >
-                                <CloseIcon />
-                            </IconButton>
+                            <Tooltip title="Save">
+                                <IconButton
+                                    onClick={() => {setAddEntryOpen(false); saveEntryData()}}
+                                >
+                                    <DoneIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Cancel">
+                                <IconButton
+                                    onClick={() => {setAddEntryOpen(false); setAddEntryData('')}}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            </Tooltip>
                         </ListItemSecondaryAction>
                     </ListSubheader>
                     :
@@ -235,12 +242,16 @@ export default function LabourTab(props) {
                         <ListItem key={`entry-${index+1}`} dense className={classes.step}>
                             <ListItemText>{entry.name} worked for {parseFloat(entry.hours).toFixed(2)} hours at ${parseFloat(entry.rate).toFixed(2)} p/h × {entry.multiplier} totalling ${(entry.hours*entry.rate*entry.multiplier).toFixed(2)}</ListItemText>
                             <ListItemSecondaryAction>
-                                <IconButton onClick={() => editEntry(index)}>
-                                    <EditIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton onClick={() => deleteEntry(index)}>
-                                    <DeleteIcon fontSize="small" />
-                                </IconButton>
+                                <Tooltip title="Edit">
+                                    <IconButton size="small" onClick={() => editEntry(index)}>
+                                        <EditIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                    <IconButton size="small" onClick={() => deleteEntry(index)}>
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
                             </ListItemSecondaryAction>
                         </ListItem>
                     )

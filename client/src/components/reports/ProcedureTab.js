@@ -15,6 +15,7 @@ import TextField from '@material-ui/core/TextField';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import { Typography } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -43,6 +44,9 @@ const useStyles = makeStyles((theme) => ({
         color: 'black',
         marginLeft: '3%'
     },
+    listItemPadding: {
+        paddingRight: 50
+    }
 }));
 
 export default function ProcedureTab(props) {
@@ -99,16 +103,20 @@ export default function ProcedureTab(props) {
                             onChange={(event) => setAddStepData(event.target.value)}
                         />
                         <ListItemSecondaryAction>
-                            <IconButton
-                                onClick={() => {setAddStepOpen(false); saveStepData()}}
-                            >
-                                <DoneIcon />
-                            </IconButton>
-                            <IconButton
-                                onClick={() => {setAddStepOpen(false); setAddStepData('')}}
-                            >
-                                <CloseIcon />
-                            </IconButton>
+                            <Tooltip title="Save">
+                                <IconButton
+                                    onClick={() => {setAddStepOpen(false); saveStepData()}}
+                                >
+                                    <DoneIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Cancel">
+                                <IconButton
+                                    onClick={() => {setAddStepOpen(false); setAddStepData('')}}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            </Tooltip>
                         </ListItemSecondaryAction>
                     </ListSubheader>
                     :
@@ -131,17 +139,23 @@ export default function ProcedureTab(props) {
                 props.procedure.map((step, index) => {
                     return(
                         <ListItem key={`step-${index+1}`} dense className={classes.step}>
-                            <ListItemText>{index+1}. {step}</ListItemText>
+                            <ListItemText className={classes.listItemPadding}>{index+1}. {step}</ListItemText>
                             <ListItemSecondaryAction>
-                                <IconButton onClick={() => promoteStep(index)}>
-                                    <ArrowUpwardIcon fontSize="small"/>
-                                </IconButton>
-                                <IconButton onClick={() => demoteStep(index)}>
-                                    <ArrowDownwardIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton onClick={() => deleteStep(index)}>
-                                    <DeleteIcon fontSize="small" />
-                                </IconButton>
+                                <Tooltip title="Promote">
+                                    <IconButton size="small" onClick={() => promoteStep(index)}>
+                                        <ArrowUpwardIcon fontSize="small"/>
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Demote">
+                                    <IconButton size="small" onClick={() => demoteStep(index)}>
+                                        <ArrowDownwardIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                    <IconButton size="small" onClick={() => deleteStep(index)}>
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
                             </ListItemSecondaryAction>
                         </ListItem>
                     )

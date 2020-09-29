@@ -10,6 +10,9 @@ import ManageButton from '../general/ManageButton';
 import readCRUD from '../../api/crud/readCRUD';
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        marginBottom: '1rem'
+    },
     breadcrumb: {
         textDecoration: 'none',
     },
@@ -18,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const cellStyle = {textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: 100}
 
 export default function Clients() {
     const classes = useStyles();
@@ -25,12 +29,12 @@ export default function Clients() {
     // table columns
     const columns = [
         {title: "id", field: "_id", hidden: true},
-        {title: "Name", field: "name"},
-        {title: "Contact Name", field: "contact"},
-        {title: "Number", field: "number"},
-        {title: "Email", field: "email"},
-        {title: "Address", field: "address"},
-        {title: "Assets", render: 
+        {title: "Name", field: "name", cellStyle: cellStyle},
+        {title: "Contact Name", field: "contact", cellStyle: cellStyle},
+        {title: "Number", field: "number", cellStyle: cellStyle},
+        {title: "Email", field: "email", cellStyle: cellStyle},
+        {title: "Address", field: "address", cellStyle: cellStyle},
+        {title: "Assets", sorting: false, render: 
             rowData => <ManageButton 
                 linkTo={`/clients/assets/${rowData._id}`} 
                 data={rowData} 
@@ -51,7 +55,7 @@ export default function Clients() {
     }, []);
 
     return (
-        <>
+        <div className={classes.root}>
             <Grid container spacing={0}>
                 <Grid item xs={1}></Grid>
                 <Grid item xs={10}>
@@ -69,8 +73,8 @@ export default function Clients() {
                 columns={columns}
                 data={data}
                 setData={setData}
-                pageSize={10}
+                pageSize={12}
             />
-        </>
+        </div>
     )
 }

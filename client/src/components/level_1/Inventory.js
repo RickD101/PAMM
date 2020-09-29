@@ -11,6 +11,9 @@ import MaterialTableComponent from '../general/MaterialTableComponent';
 import readCRUD from '../../api/crud/readCRUD';
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        marginBottom: '1rem'
+    },
     breadcrumb: {
         textDecoration: 'none',
     },
@@ -29,6 +32,8 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const cellStyle = {textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: 100}
+
 export default function Inventory() {
     const classes = useStyles();
 
@@ -39,12 +44,12 @@ export default function Inventory() {
     // Item table columns
     const columns = [
         {title: "id", field: "_id", hidden: true},
-        {title: "Description", field: "description"},
-        {title: "Category", field: "category", lookup: {i1: "part", i2: "consumable", i3: "other" }},
-        {title: "Cost", field: "cost", type: "currency"},
-        {title: "Quantity in Stock", field: "quantity"},
-        {title: "Code", field: "code"},
-        {title: "Supplier", field: "supplier._id", lookup: suppData}
+        {title: "Description", field: "description", cellStyle: cellStyle},
+        {title: "Category", field: "category", cellStyle: cellStyle, width: 130, lookup: {part: "part", consumable: "consumable", other: "other" }},
+        {title: "Cost", field: "cost", type: "currency", cellStyle: cellStyle, width: 20},
+        {title: "Quantity in Stock", field: "quantity", cellStyle: cellStyle, width: 130},
+        {title: "Code", field: "code", cellStyle: cellStyle, width: 120},
+        {title: "Supplier", field: "supplier._id", cellStyle: cellStyle, lookup: suppData}
     ];
 
     useEffect(() => {
@@ -68,7 +73,7 @@ export default function Inventory() {
     }, []);
 
     return (
-        <>
+        <div className={classes.root}>
             <Grid container spacing={0}>
                 <Grid item xs={1}></Grid>
                 <Grid item xs={10}>
@@ -86,7 +91,7 @@ export default function Inventory() {
                 columns={columns}
                 data={data}
                 setData={setData}
-                pageSize={8}
+                pageSize={10}
             />
 
             <Grid container spacing={0}>
@@ -105,6 +110,6 @@ export default function Inventory() {
                 </Grid>
                 <Grid item xs={1}></Grid>
             </Grid>
-        </>
+        </div>
     )
 }

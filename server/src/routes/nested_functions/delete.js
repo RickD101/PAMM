@@ -78,10 +78,10 @@ const deleteFn = async (body) => {
                 owner: body.id
             })
             await WorkOrder.deleteMany({
-                owner: body._id
+                owner: body.id
             });
             const assocComponents = await Component.find({
-                asset: body._id
+                asset: body.id
             })
             await Promise.all(
                 assocComponents.map(async (component) => {
@@ -94,7 +94,7 @@ const deleteFn = async (body) => {
                 })
             )
             await Component.deleteMany({
-                asset: asset._id
+                asset: body.id
             })
             data = await Asset.findOneAndDelete({
                 _id: body.id
@@ -106,7 +106,7 @@ const deleteFn = async (body) => {
                 owner: body.id
             })
             await WorkOrder.deleteMany({
-                owner: body._id
+                owner: body.id
             });
             data = await Component.findOneAndDelete({
                 _id: body.id

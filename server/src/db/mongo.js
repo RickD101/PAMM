@@ -20,3 +20,5 @@ mongoose.connection.on('error', (err) => {
 mongoose.connection.on('disconncted', () => {
     console.log('Mongoose disconnected')
 });
+
+module.exports = mongoose;

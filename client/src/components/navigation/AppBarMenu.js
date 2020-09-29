@@ -15,6 +15,7 @@ import userLogout from '../../api/user/userLogout'
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
+        marginBottom: 64
     },
     menuButton: {
         marginRight: theme.spacing(2),
@@ -33,7 +34,7 @@ export default function AppBarMenu(props) {
 
     return (
         <div className={classes.root}>
-            <AppBar position="sticky">
+            <AppBar position="fixed">
                 <Toolbar>
                     {props.loginStatus &&
                         <IconButton 

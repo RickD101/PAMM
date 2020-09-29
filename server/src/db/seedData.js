@@ -66,14 +66,14 @@ const assetsData = [
         clientIndex: 2
     },
     {
-        name: "Captain America's shield",
+        name: "Captain America's Shield",
         description: "Vibranium and/or adamantium",
         code: "SHLD3",
         clientIndex: 2
     }
 ]
 
-componentsData = [
+const componentsData = [
     {
         name: "Thruster Fan",
         description: "You lift me up",
@@ -94,7 +94,7 @@ componentsData = [
     }
 ]
 
-suppliersData = [
+const suppliersData = [
     {
         name: "Bunnings Warehouse",
         description: "General hardware",
@@ -145,7 +145,7 @@ suppliersData = [
     }
 ]
 
-itemsData = [
+const itemsData = [
     {
         description: "Red paint aerosol",
         category: "consumable",
@@ -307,7 +307,7 @@ itemsData = [
     }
 ]
 
-proceduresData = [
+const proceduresData = [
     {
         description: "Standard safety procedure",
         category: "safety",
@@ -322,7 +322,7 @@ proceduresData = [
     }
 ]
 
-workersData = [
+const workersData = [
     {
         name: "Scoobert Doo",
         base_rate: 25,
@@ -361,7 +361,7 @@ workersData = [
     }
 ]
 
-routinesData = [
+const routinesData = [
     {
         ownerIndex: 3,
         ownerModel: 'Asset',

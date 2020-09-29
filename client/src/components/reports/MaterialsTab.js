@@ -20,6 +20,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { Typography } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -136,16 +137,42 @@ export default function MaterialsTab(props) {
                                         <em>(select)</em>
                                     </MenuItem>
                                     {props.itemData &&
-                                    props.itemData.map((item) => (
-                                        <MenuItem 
-                                            key={item._id} 
-                                            value={item._id}
-                                            cost={item.cost}
-                                            description={item.description}
-                                        >
-                                            {item.description}
-                                        </MenuItem>
-                                    ))}
+                                    [
+                                        <ListSubheader>Parts</ListSubheader>,
+                                        props.itemData.filter(item => item.category === 'part').map(item => (
+                                            <MenuItem 
+                                                key={item._id} 
+                                                value={item._id}
+                                                cost={item.cost}
+                                                description={item.description}
+                                            >
+                                                {item.description}
+                                            </MenuItem>
+                                        )),
+                                        <ListSubheader>Consumables</ListSubheader>,
+                                        props.itemData.filter(item => item.category === 'consumable').map(item => (
+                                            <MenuItem 
+                                                key={item._id} 
+                                                value={item._id}
+                                                cost={item.cost}
+                                                description={item.description}
+                                            >
+                                                {item.description}
+                                            </MenuItem>
+                                        )),
+                                        <ListSubheader>Other</ListSubheader>,
+                                        props.itemData.filter(item => item.category === 'other').map(item => (
+                                            <MenuItem 
+                                                key={item._id} 
+                                                value={item._id}
+                                                cost={item.cost}
+                                                description={item.description}
+                                            >
+                                                {item.description}
+                                            </MenuItem>
+                                        )),
+                                    ]
+                                    }
                                 </Select>
                             </FormControl>
                             <FormControl className={classes.costField}>
@@ -170,16 +197,20 @@ export default function MaterialsTab(props) {
                             </FormControl>
                         </FormGroup>
                         <ListItemSecondaryAction>
-                            <IconButton
-                                onClick={() => {setAddEntryOpen(false); saveEntryData()}}
-                            >
-                                <DoneIcon />
-                            </IconButton>
-                            <IconButton
-                                onClick={() => {setAddEntryOpen(false); setAddEntryData(blank)}}
-                            >
-                                <CloseIcon />
-                            </IconButton>
+                            <Tooltip title="Save">
+                                <IconButton
+                                    onClick={() => {setAddEntryOpen(false); saveEntryData()}}
+                                >
+                                    <DoneIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Cancel">
+                                <IconButton
+                                    onClick={() => {setAddEntryOpen(false); setAddEntryData('')}}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            </Tooltip>
                         </ListItemSecondaryAction>
                     </ListSubheader>
                     :
@@ -206,12 +237,16 @@ export default function MaterialsTab(props) {
                         <ListItem key={`entry-${index+1}`} dense className={classes.step}>
                             <ListItemText>{entry.description}: {entry.quantity} @ ${parseFloat(entry.cost).toFixed(2)} totalling ${parseFloat(entry.cost*entry.quantity).toFixed(2)}</ListItemText>
                             <ListItemSecondaryAction>
-                                <IconButton onClick={() => editEntry(index)}>
-                                    <EditIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton onClick={() => deleteEntry(index)}>
-                                    <DeleteIcon fontSize="small" />
-                                </IconButton>
+                                <Tooltip title="Edit">
+                                    <IconButton size="small" onClick={() => editEntry(index)}>
+                                        <EditIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                    <IconButton size="small" onClick={() => deleteEntry(index)}>
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
                             </ListItemSecondaryAction>
                         </ListItem>
                     )

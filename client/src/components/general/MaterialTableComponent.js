@@ -88,7 +88,10 @@ export default function MaterialTableComponent(props) {
             if (response) {
                 if (response.status) {
                     newData._id = response.id;
-                    const dataToAdd = [...props.data];
+                    let dataToAdd = []
+                    if (props.data) {
+                        dataToAdd = [...props.data];
+                    }
                     dataToAdd.push(newData);
                     props.setData(dataToAdd);
                     resolve();

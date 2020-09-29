@@ -89,44 +89,30 @@ const createFn = async (body) => {
             }
 
         case 'WorkOrder':
-            
-            if (body.data.asset) {
-                let findAsset = await Asset.findOne({
-                    _id: body.data.asset
+            let findOwner;
+            if (body.data.ownerModel === 'Asset') {
+                findOwner = await Asset.findOne({
+                    _id: body.data.owner
                 });
-                
-                if (findAsset) {
-                    if (!body.data.completed && body.data.actual_completion) {
-                        delete body.data.actual_completion
-                    }
-                    body.data.owner = body.data.asset;
-                    body.data.ownerModel = 'Asset';
-                    data = await WorkOrder.create(body.data);
-                    return data;
-                }
-                else {
-                    throw {message: 'Associated asset not found.'};
-                }
             }
-            else if (body.data.component) {
-                let findComponent = await Component.findOne({
-                    _id: body.data.component
+            else if (body.data.ownerModel === 'Component') {
+                findOwner = await Component.findOne({
+                    _id: body.data.owner
                 });
-                if (findComponent) {
-                    if (!body.data.completed && body.data.actual_completion) {
-                        delete body.data.actual_completion
-                    }
-                    body.data.owner = body.data.component;
-                    body.data.ownerModel = 'Component';
-                    data = await WorkOrder.create(body.data);
-                    return data;
-                }
-                else {
-                    throw {message: 'Associated component not found.'};
-                }
             }
             else {
-                throw {message: 'Associated asset or component not found'};
+                throw {message: 'Owner model is incorrectly defined or missing.'};
+            }
+                
+            if (findOwner) {
+                if (!body.data.completed && body.data.actual_completion) {
+                    delete body.data.actual_completion
+                }
+                data = await WorkOrder.create(body.data);
+                return data;
+            }
+            else {
+                throw {message: 'Associated asset or component not found.'};
             }
             
         default:

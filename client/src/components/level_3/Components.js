@@ -24,48 +24,44 @@ const useStyles = makeStyles((theme) => ({
 
 const cellStyle = {textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: 100}
 
-export default function Assets() {
+export default function Components() {
     const classes = useStyles();
     const { id } = useParams();
 
     // table columns
     const columns = [
         {title: "id", field: "_id", hidden: true},
-        {title: "client", field: "client", hidden: true},
+        {title: "asset", field: "asset", hidden: true},
         {title: "Name", field: "name", cellStyle: cellStyle},
         {title: "Description", field: "description", cellStyle: cellStyle},
         {title: "Code", field: "code", cellStyle: cellStyle},
-        {title: "Components", sorting: false, width: 20, render: 
-            rowData => <ManageButton 
-                linkTo={`/clients/assets/components/${rowData._id}`} 
-                passClass={classes.navButtonText}/>},
         {title: "Routines", sorting: false, width: 20, render: 
             rowData => <ManageButton 
-                linkTo={`/clients/assets/routines/${rowData._id}`} 
+                linkTo={`/clients/assets/components/routines/${rowData._id}`} 
                 passClass={classes.navButtonText}/>}
     ];
 
     // table data
     const [data, setData] = useState([]);
-    const [clientData, setClientData] = useState({});
+    const [assetData, setAssetData] = useState({client: {}});
     const [dataPresent, setDataPresent] = useState(true);
 
     useEffect(() => {
-        document.title = 'PAMM: Asset Management';
+        document.title = 'PAMM: Component Management';
 
-        findOneCRUD({model: "Client", id: id}).then((response)=>{
+        findOneCRUD({model: "Asset", id: id}).then((response)=>{
             if (response.status){
-                setClientData(response.data);
+                setAssetData(response.data);
             }
             else {
-                alert('Client does not exist, redirecting to home...');
+                alert('Asset does not exist, redirecting to home...');
                 setDataPresent(false);
             }
         }).catch((err)=>{
             alert(err);
         });
 
-        findCRUD({model: "Asset", searchFields: {client: id}}).then((response)=>{
+        findCRUD({model: "Component", searchFields: {asset: id}}).then((response)=>{
             setData(response.data);
         }).catch((err)=>{
             alert(err);
@@ -83,20 +79,23 @@ export default function Assets() {
                         <h3>
                             <Link to="/" className={classes.breadcrumb}>Home</Link>
                             /<Link to="/clients" className={classes.breadcrumb}>Client Management</Link>
-                            /Asset Management for {clientData.name}
+                            /<Link to={`/clients/assets/${assetData.client._id}`} className={classes.breadcrumb}>
+                                Asset Management for {assetData.client.name}
+                            </Link>
+                            /Component Management for {assetData.name}
                         </h3>
                     </Grid>
                     <Grid item xs={1}></Grid>
                 </Grid>
 
                 <MaterialTableComponent 
-                    model={'Asset'}
-                    title={`${clientData.name} Assets`}
+                    model={'Component'}
+                    title={`${assetData.name} Components`}
                     columns={columns}
                     data={data}
                     setData={setData}
                     pageSize={12}
-                    additionalFields = {{client: clientData._id}}
+                    additionalFields = {{asset: assetData._id}}
                 />
             </div>
             : <Redirect to='/'/>

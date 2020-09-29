@@ -52,8 +52,14 @@ const findFn = async (body) => {
 
         case 'WorkOrder':
             data = await WorkOrder.find(body.searchFields).populate(
-                ['owner', 'scheduled', 'labour.worker', 'materials.item']
-            );
+                ['scheduled', 'labour.worker', 'materials.item']
+            ).populate({
+                path: 'owner',
+                populate: { path: 'asset', populate: { path: 'client' } }
+            }).populate({
+                path: 'owner',
+                populate: { path: 'client' }
+            });
             return data;
 
         default:

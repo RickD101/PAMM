@@ -13,6 +13,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Select from '@material-ui/core/Select';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import TextField from '@material-ui/core/TextField';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
@@ -78,11 +79,12 @@ export default function NewWorkOrder(props) {
     const classes = useStyles();
     const blank = {
         client: '',
-        asset: '',
+        owner: '',
+        ownerModel: '',
         active: false,
         completed: false,
-        description: 'Add work description here',
-        expected_completion: new Date().yyyymmdd(),
+        description: '',
+        expected_completion: new Date(),
         actual_completion: new Date().yyyymmdd(),
     }
 
@@ -97,6 +99,7 @@ export default function NewWorkOrder(props) {
 
     const [clientData, setClientData] = useState([]);
     const [assetData, setAssetData] = useState([]);
+    const [componentData, setComponentData] = useState([]);
     
     const [workerData, setWorkerData] = useState([]);
     const [itemData, setItemData] = useState([]);
@@ -112,6 +115,12 @@ export default function NewWorkOrder(props) {
 
         readCRUD({model: "Asset"}).then((response)=>{
             setAssetData(response.data);
+        }).catch((err)=>{
+            alert(err);
+        })
+
+        readCRUD({model: "Component"}).then((response)=>{
+            setComponentData(response.data);
         }).catch((err)=>{
             alert(err);
         })
@@ -172,10 +181,17 @@ export default function NewWorkOrder(props) {
 
     const handleClientChange = (event) => {
         const newFormState = {...formState};
-        newFormState.asset = '';
+        newFormState.owner = '';
         newFormState.client = event.target.value;
         setFormState(newFormState);
     }
+
+    const handleOwnerChange = (event) => {
+        const newFormState = {...formState};
+        newFormState.ownerModel = event.currentTarget.getAttribute('ownermodel');
+        newFormState.owner = event.target.value;
+        setFormState(newFormState);
+    };
 
     const handleCheckboxChange = (event) => {
         if (event.target.name === 'active' && formState.completed) {
@@ -269,15 +285,15 @@ export default function NewWorkOrder(props) {
             </Grid>
             <Grid item xs={4}>
                 <FormControl className={classes.formControl}>
-                    <InputLabel shrink id="assetField-label">
-                        Asset
+                    <InputLabel shrink id="ownerField-label">
+                        Asset/Component
                     </InputLabel>
                     <Select
-                        labelId="assetField-label"
-                        id="assetField"
-                        name="asset"
-                        value={formState.asset}
-                        onChange={handleChange}
+                        labelId="ownerField-label"
+                        id="ownerField"
+                        name="owner"
+                        value={formState.owner}
+                        onChange={handleOwnerChange}
                         displayEmpty
                         className={classes.inputBox}
                     >
@@ -291,10 +307,28 @@ export default function NewWorkOrder(props) {
                                 <em>(select client)</em>
                             </MenuItem>
                         }
+                        
                         {(assetData && formState.client) &&
-                        assetData.filter(asset => asset.client._id === formState.client).map(asset => (
-                            <MenuItem key={asset._id} value={asset._id}>{asset.name}</MenuItem>
-                        ))}   
+                            [
+                                <ListSubheader>Assets</ListSubheader>,
+                                assetData.filter(asset => asset.client._id === formState.client).map(asset => (
+                                    <MenuItem key={asset._id} value={asset._id} ownermodel="Asset">
+                                        {asset.name}
+                                    </MenuItem>
+                                ))
+                            ]               
+                        }
+                        
+                        {(componentData && formState.client) &&
+                            [
+                                <ListSubheader>Components</ListSubheader>,
+                                componentData.filter(component => component.asset.client._id === formState.client).map(component => (
+                                    <MenuItem key={component._id} value={component._id} ownermodel="Component">
+                                        {component.asset.name} → {component.name}
+                                    </MenuItem>
+                                ))
+                            ]
+                        }
                     </Select>
                 </FormControl>
             </Grid>
@@ -332,6 +366,7 @@ export default function NewWorkOrder(props) {
                         id="descriptionField"
                         name="description"
                         label="Work description"
+                        placeholder="Add work description here"
                         value={formState.description}
                         onChange={handleChange}
                         className={classes.inputBox}
@@ -343,6 +378,7 @@ export default function NewWorkOrder(props) {
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <KeyboardDatePicker
                                 disableToolbar
+                                autoOk
                                 variant="inline"
                                 format="dd/MM/yyyy"
                                 margin="normal"
@@ -362,6 +398,8 @@ export default function NewWorkOrder(props) {
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <KeyboardDatePicker
                                 disableToolbar
+                                autoOk
+                                disabled={!formState.completed}
                                 variant="inline"
                                 format="dd/MM/yyyy"
                                 margin="normal"

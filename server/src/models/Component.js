@@ -8,7 +8,7 @@ const schema = new mongoose.Schema({
     },
     name: {
         type: String,
-        requied: true
+        required: true
     },
     description: {
         type: String

@@ -6,6 +6,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PrintIcon from '@material-ui/icons/Print';
+import Tooltip from '@material-ui/core/Tooltip';
 
 // inclusions
 import MaterialTableNonEdit from '../general/MaterialTableNonEdit';
@@ -60,40 +61,54 @@ export default function ManageWorkOrders(props) {
         {title: "id", field: "_id", hidden: true},
         {title: "active", field: "active", hidden: true},
         {title: "completed", field: "completed", hidden: true},
-        {title: "description", field: "description", hidden: true},
-        {title: "Client", field: "client.name", render: rowData => determineStatus(rowData)},
-        {title: "Asset", field: "asset.name"},
-        {title: "Due", field: "expected_completion", type: "date"},
-        {title: "Actions", sorting: false, render: rowData => renderButtons(rowData)}
+        {title: "Client", field: "owner.client.name", render: rowData => determineStatusAndClient(rowData)},
+        {title: "Asset/Component", field: "owner.name"},
+        {title: "Description", field: "description"},
+        {title: "Due", field: "expected_completion", width: 80, type: "date"},
+        {title: "Actions", sorting: false, width: 120, render: rowData => renderButtons(rowData)}
     ];
 
     // table data
     const [data, setData] = useState([]);
 
-    const determineStatus = (data) => {
+    const determineStatusAndClient = (data) => {
+        let clientName = '';
+        if (data.owner.client) {
+            clientName = data.owner.client.name;
+        }
+        else if (data.owner.asset) {
+            clientName = data.owner.asset.client.name;
+        }
+
         if (data.active) {
-            return <><div className={classes.activeBadge}/> {data.client.name}</>
+            return <><div className={classes.activeBadge}/> {clientName}</>
         }
         else if (data.completed) {
-            return <><div className={classes.completedBadge}/> {data.client.name}</>
+            return <><div className={classes.completedBadge}/> {clientName}</>
         }
         else {
-            return <><div className={classes.inactiveBadge}/> {data.client.name}</>
+            return <><div className={classes.inactiveBadge}/> {clientName}</>
         }
     }
 
     const renderButtons = (data) => {
         return(
             <>
-            <IconButton size="small" onClick={() => {editWorkOrder(data)}}>
-                <EditIcon fontSize="small" />
-            </IconButton>
-            <IconButton size="small" onClick={() => {printWorkOrder(data)}}>
-                <PrintIcon fontSize="small" />
-            </IconButton>
-            <IconButton size="small" onClick={() => {deleteWorkOrder(data)}}>
-                <DeleteIcon fontSize="small" />
-            </IconButton>
+            <Tooltip title="View/Edit">
+                <IconButton size="small" onClick={() => {editWorkOrder(data)}}>
+                    <EditIcon fontSize="small" />
+                </IconButton>
+            </Tooltip>
+            <Tooltip title="Print">
+                <IconButton size="small" onClick={() => {printWorkOrder(data)}}>
+                    <PrintIcon fontSize="small" />
+                </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+                <IconButton size="small" onClick={() => {deleteWorkOrder(data)}}>
+                    <DeleteIcon fontSize="small" />
+                </IconButton>
+            </Tooltip>
             </>
         )
     }

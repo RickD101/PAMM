@@ -27,19 +27,19 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Routines() {
+export default function ComponentRoutines() {
     const classes = useStyles();
     const { id } = useParams();
 
-    const [assetData, setAssetData] = useState({client: {}});
+    const [componentData, setComponentData] = useState({asset: {client: {}}});
     const [dataPresent, setDataPresent] = useState(true);
 
     useEffect(() => {
         document.title = 'PAMM: Routine Management';
 
-        findOneCRUD({model: "Asset", id: id}).then((response)=>{
+        findOneCRUD({model: "Component", id: id}).then((response)=>{
             if (response.status){
-                setAssetData(response.data);
+                setComponentData(response.data);
             }
             else {
                 alert('Asset does not exist, redirecting to home...');
@@ -52,7 +52,7 @@ export default function Routines() {
 
     return (
         <>
-        {dataPresent ?
+        {dataPresent ? 
             <div className={classes.root}>
                 <Grid container spacing={0}>
                     <Grid item xs={1}></Grid>
@@ -60,8 +60,13 @@ export default function Routines() {
                         <h3>
                             <Link to="/" className={classes.breadcrumb}>Home</Link>
                             /<Link to="/clients" className={classes.breadcrumb}>Client Management</Link>
-                            /<Link to={`/clients/assets/${assetData.client._id}`} className={classes.breadcrumb}>Asset Management for {assetData.client.name}</Link>
-                            /Routine Management for {assetData.name}
+                            /<Link to={`/clients/assets/${componentData.asset.client._id}`} className={classes.breadcrumb}>
+                                Asset Management for {componentData.asset.client.name}
+                            </Link>
+                            /<Link to={`/clients/assets/components/${componentData.asset._id}`} className={classes.breadcrumb}>
+                                Component Management for {componentData.asset.name}
+                            </Link>
+                            /Routine Management for {componentData.name}
                         </h3>
                     </Grid>
                     <Grid item xs={1}></Grid>
