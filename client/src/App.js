@@ -17,6 +17,8 @@ import Routines from './components/level_3/Routines';
 import Components from './components/level_3/Components';
 import ComponentRoutines from './components/level_4/ComponentRoutines';
 import MenuDrawer from './components/navigation/MenuDrawer';
+import Procedures from './components/level_1/Procedures';
+import ModifyProcedure from './components/level_2/ModifyProcedure';
 
 export default function App() {
 
@@ -52,8 +54,14 @@ export default function App() {
                     <Route exact path="/inventory">
                         <Inventory />
                     </Route>
+                    <Route exact path="/procedures">
+                        <Procedures />
+                    </Route>
                     <Route exact path="/inventory/suppliers">
                         <Suppliers />
+                    </Route>
+                    <Route path="/procedures/:id">
+                        <ModifyProcedure />
                     </Route>
                     <Route path="/clients/assets/routines/:id">
                         <Routines />

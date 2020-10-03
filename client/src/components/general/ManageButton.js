@@ -13,7 +13,7 @@ export default function ManageButton(props) {
                 size="small"
                 endIcon={<SubdirectoryArrowRightIcon />}
             >
-                Manage
+                {props.text || 'Manage'}
             </Button>
         </Link>
     )

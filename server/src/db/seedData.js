@@ -312,12 +312,13 @@ const proceduresData = [
         description: "Standard safety procedure",
         category: "safety",
         procedure: [
-            "Is your PPE suitable for the task?",
-            "Ensure all appropriate electrical isolations are applied",
-            "Ensure all appropriate mechanical isolations are applied",
-            "Ensure all appropriate pneumatic/hydraulic isolations are applied",
-            "Is the area sufficiently barricaded?",
-            "Have you signed onto all relevant permits?"
+            "Is your PPE suitable for the task?|y|0",
+            "Are all appropriate electrical isolations applied?|y|0",
+            "Are all appropriate mechanical isolations applied?|y|0",
+            "Are all appropriate pneumatic/hydraulic isolations applied?|y|0",
+            "Is the area sufficiently barricaded?|y|0",
+            "Have you signed onto all relevant permits?|y|0",
+            "Record any additional safety measures required:|n|3"
         ]
     }
 ]

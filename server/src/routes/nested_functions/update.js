@@ -27,7 +27,7 @@ const updateFn = async (body) => {
                     _id: body.id
                 },
                 body.data,
-                {new: true}
+                {new: true, runValidators: true}
             );
             return data;
 
@@ -37,7 +37,7 @@ const updateFn = async (body) => {
                     _id: body.id
                 },
                 body.data,
-                {new: true}
+                {new: true, runValidators: true}
             );
             return data;
 
@@ -47,7 +47,7 @@ const updateFn = async (body) => {
                     _id: body.id
                 },
                 body.data,
-                {new: true}
+                {new: true, runValidators: true}
             );
             return data;
 
@@ -57,7 +57,7 @@ const updateFn = async (body) => {
                     _id: body.id
                 },
                 body.data,
-                {new: true}
+                {new: true, runValidators: true}
             );
             return data;
 
@@ -71,7 +71,7 @@ const updateFn = async (body) => {
                         _id: body.id
                     },
                     body.data,
-                    {new: true}
+                    {new: true, runValidators: true}
                 );
                 return data;
             }
@@ -89,7 +89,7 @@ const updateFn = async (body) => {
                         _id: body.id
                     },
                     body.data,
-                    {new: true}
+                    {new: true, runValidators: true}
                 );
                 return data;
             }
@@ -110,7 +110,7 @@ const updateFn = async (body) => {
                             _id: body.id
                         },
                         body.data,
-                        {new: true}
+                        {new: true, runValidators: true}
                     );
                     return data;
                 }
@@ -130,7 +130,7 @@ const updateFn = async (body) => {
                             _id: body.id
                         },
                         body.data,
-                        {new: true}
+                        {new: true, runValidators: true}
                     );
                     return data;
                 }
@@ -158,7 +158,7 @@ const updateFn = async (body) => {
                             _id: body.id
                         },
                         body.data,
-                        {new: true}
+                        {new: true, runValidators: true}
                     );
                     return data;
                 }
@@ -181,7 +181,7 @@ const updateFn = async (body) => {
                             _id: body.id
                         },
                         body.data,
-                        {new: true}
+                        {new: true, runValidators: true}
                     );
                     return data;
                 }

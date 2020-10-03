@@ -13,6 +13,7 @@ import BuildIcon from '@material-ui/icons/Build';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import StorefrontIcon from '@material-ui/icons/Storefront';
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 
 const useStyles = makeStyles({
     list: {
@@ -85,6 +86,12 @@ export default function MenuDrawer(props) {
                     </ListItem>
                 </Link>
                 <Divider />
+                <Link to="/procedures" className={classes.navButton}>
+                    <ListItem button>
+                        <ListItemIcon><PlaylistAddCheckIcon /></ListItemIcon>
+                        <ListItemText primary="Procedures" />
+                    </ListItem>
+                </Link>
             </List>
         </div>
   );

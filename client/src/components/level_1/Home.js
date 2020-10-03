@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     navButton: {
         padding: theme.spacing(2),
         fontSize: '1.3rem',
-        minHeight: '100px',
+        minHeight: '115px',
     },
     navButtonIcon: {
         margin: theme.spacing(1),
