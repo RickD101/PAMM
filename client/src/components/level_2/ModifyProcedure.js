@@ -111,7 +111,7 @@ export default function ModifyProcedure() {
                     </Grid>
                     <Grid item xs={4}>
                         <Paper className={classes.displayPaneRight} elevation={3}>
-                        
+                            
                         </Paper>
                     </Grid>
                     <Grid item xs={1}></Grid>

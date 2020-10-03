@@ -10,6 +10,7 @@ const Procedure = require('../../models/Procedure');
 const WorkOrder = require('../../models/WorkOrder');
 
 const createFn = async (body) => {
+    let findOwner;
     switch (body.model) {
         case 'Client':
             data = await Client.create(body.data);
@@ -56,40 +57,29 @@ const createFn = async (body) => {
             }
 
         case 'Routine':
-            if (body.data.asset) {
-                let findAsset = await Asset.findOne({
-                    _id: body.data.asset
+            if (body.data.ownerModel === 'Asset') {
+                findOwner = await Asset.findOne({
+                    _id: body.data.owner
                 });
-                if (findAsset) {
-                    body.data.owner = body.data.asset;
-                    body.data.ownerModel = 'Asset';
-                    data = await Routine.create(body.data);
-                    return data;
-                }
-                else {
-                    throw {message: 'Associated asset not found.'};
-                }
             }
-            else if (body.data.component) {
-                let findComponent = await Component.findOne({
-                    _id: body.data.component
+            else if (body.data.ownerModel === 'Component') {
+                findOwner = await Component.findOne({
+                    _id: body.data.owner
                 });
-                if (findComponent) {
-                    body.data.owner = body.data.component;
-                    body.data.ownerModel = 'Component';
-                    data = await Routine.create(body.data);
-                    return data;
-                }
-                else {
-                    throw {message: 'Associated component not found.'};
-                }
             }
             else {
-                throw {message: 'Associated asset or component not found'};
+                throw {message: 'Owner model is incorrectly defined or missing.'};
+            }
+
+            if (findOwner) {
+                    data = await Routine.create(body.data);
+                    return data;
+            }
+            else {
+                throw {message: `Associated ${body.data.ownerModel} not found.`};
             }
 
         case 'WorkOrder':
-            let findOwner;
             if (body.data.ownerModel === 'Asset') {
                 findOwner = await Asset.findOne({
                     _id: body.data.owner
@@ -112,7 +102,7 @@ const createFn = async (body) => {
                 return data;
             }
             else {
-                throw {message: 'Associated asset or component not found.'};
+                throw {message: `Associated ${body.data.ownerModel} not found.`};
             }
             
         default:

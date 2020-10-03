@@ -31,11 +31,10 @@ export default function Procedures() {
         {title: "id", field: "_id", hidden: true},
         {title: "Description", field: "description", cellStyle: cellStyle},
         {title: "Category", field: "category", cellStyle: cellStyle, lookup: {safety: "safety", work: "work", other: "other"}},
-        {title: "Procedure", width: 100, sorting: false, render: 
+        {title: "Steps", width: 100, sorting: false, render: 
             rowData => <ManageButton 
                 linkTo={`/procedures/${rowData._id}`}
                 text="modify"
-                data={rowData} 
                 passClass={classes.navButtonText}/>}
     ];
 

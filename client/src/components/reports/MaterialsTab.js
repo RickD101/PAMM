@@ -180,6 +180,7 @@ export default function MaterialsTab(props) {
                                 <Input
                                     id="costField"
                                     name="cost"
+                                    readOnly
                                     startAdornment={<InputAdornment position="start">$</InputAdornment>}
                                     value={addEntryData.cost}
                                     onChange={handleChange}

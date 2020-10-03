@@ -46,21 +46,20 @@ const generateAllWO = async (period = 7) => {
 const generateWO = async (routine, date) => {
     let workOrders = [];
     
-    const WOfreq = routine.freq_WO_gen.split('.');
     let WOfreqDays;
     
-    switch (WOfreq[1]) {
+    switch (routine.freq_WO_gen_unit) {
         case 'd':
-            WOfreqDays = WOfreq[0]*1;
+            WOfreqDays = routine.freq_WO_gen_number*1;
             break;
         case 'w':
-            WOfreqDays = WOfreq[0]*7;
+            WOfreqDays = routine.freq_WO_gen_number*7;
             break;
         case 'm':
-            WOfreqDays = WOfreq[0]*30;
+            WOfreqDays = routine.freq_WO_gen_number*30;
             break;
         case 'y':
-            WOfreqDays = WOfreq[0]*365;
+            WOfreqDays = routine.freq_WO_gen_number*365;
             break;
         default:
             throw {message: 'Routine provided invalid generation frequency.'}

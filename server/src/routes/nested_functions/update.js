@@ -10,6 +10,7 @@ const Procedure = require('../../models/Procedure');
 const WorkOrder = require('../../models/WorkOrder');
 
 const updateFn = async (body) => {
+    let findOwner;
     switch (body.model) {
         case 'Client':
             data = await Client.findOneAndUpdate(
@@ -17,7 +18,7 @@ const updateFn = async (body) => {
                     _id: body.id
                 },
                 body.data,
-                {new: true}
+                {new: true, runValidators: true}
             );
             return data;
 
@@ -98,99 +99,64 @@ const updateFn = async (body) => {
             }
 
         case 'Routine':
-            if (body.data.asset) {
-                let findAsset = await Asset.findOne({
-                    _id: body.data.asset
+            if (body.data.ownerModel === 'Asset') {
+                findOwner = await Asset.findOne({
+                    _id: body.data.owner
                 });
-                if (findAsset) {
-                    body.data.owner = body.data.asset;
-                    body.data.ownerModel = 'Asset';
-                    data = await Routine.findOneAndUpdate(
-                        {
-                            _id: body.id
-                        },
-                        body.data,
-                        {new: true, runValidators: true}
-                    );
-                    return data;
-                }
-                else {
-                    throw {message: 'Associated asset not found, cannot update.'};
-                }
             }
-            else if (body.data.component) {
-                let findComponent = await Component.findOne({
-                    _id: body.data.component
+            else if (body.data.ownerModel === 'Component') {
+                findOwner = await Component.findOne({
+                    _id: body.data.owner
                 });
-                if (findComponent) {
-                    body.data.owner = body.data.component;
-                    body.data.ownerModel = 'Component';
-                    data = await Routine.findOneAndUpdate(
-                        {
-                            _id: body.id
-                        },
-                        body.data,
-                        {new: true, runValidators: true}
-                    );
-                    return data;
-                }
-                else {
-                    throw {message: 'Associated component not found, cannot update.'};
-                }
             }
             else {
-                throw {message: 'Associated asset or component not found, cannot update.'};
+                throw {message: 'Owner model is incorrectly defined or missing.'};
+            }
+
+            if (findOwner) {
+                    data = await Routine.findOneAndUpdate(
+                        {
+                            _id: body.id
+                        },
+                        body.data,
+                        {new: true, runValidators: true}
+                    );
+                    return data;
+            }
+            else {
+                throw {message: `Associated ${body.data.ownerModel} not found, cannot update.`};
             }
 
         case 'WorkOrder':
-            if (body.data.asset) {
-                let findAsset = await Asset.findOne({
-                    _id: body.data.asset
+            if (body.data.ownerModel === 'Asset') {
+                findOwner = await Asset.findOne({
+                    _id: body.data.owner
                 });
-                if (findAsset) {
-                    if (!completed) {
-                        body.data.actual_completion = null
-                    }
-                    body.data.owner = body.data.asset;
-                    body.data.ownerModel = 'Asset';
-                    data = await WorkOrder.findOneAndUpdate(
-                        {
-                            _id: body.id
-                        },
-                        body.data,
-                        {new: true, runValidators: true}
-                    );
-                    return data;
-                }
-                else {
-                    throw {message: 'Associated asset not found, cannot update.'};
-                }
             }
-            else if (body.data.component) {
-                let findComponent = await Component.findOne({
-                    _id: body.data.component
+            else if (body.data.ownerModel === 'Component') {
+                findOwner = await Component.findOne({
+                    _id: body.data.owner
                 });
-                if (findComponent) {
-                    if (!completed) {
-                        body.data.actual_completion = null
-                    }
-                    body.data.owner = body.data.component;
-                    body.data.ownerModel = 'Component';
-                    data = await WorkOrder.findOneAndUpdate(
-                        {
-                            _id: body.id
-                        },
-                        body.data,
-                        {new: true, runValidators: true}
-                    );
-                    return data;
-                }
-                else {
-                    throw {message: 'Associated component not found, cannot update.'};
-                }
             }
             else {
-                throw {message: 'Associated asset or component not found, cannot update.'};
+                throw {message: 'Owner model is incorrectly defined or missing.'};
+            }
+                
+            if (findOwner) {
+                if (!body.data.completed && body.data.actual_completion) {
+                    delete body.data.actual_completion
+                }
+                data = await WorkOrder.findOneAndUpdate(
+                    {
+                        _id: body.id
+                    },
+                    body.data,
+                    {new: true, runValidators: true}
+                );
+                return data;
+            }
+            else {
+                throw {message: `Associated ${body.data.ownerModel} not found.`};
             }
             
         default:

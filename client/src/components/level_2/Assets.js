@@ -69,7 +69,7 @@ export default function Assets() {
             setData(response.data);
         }).catch((err)=>{
             alert(err);
-        })
+        });
 
     }, [id]);
 

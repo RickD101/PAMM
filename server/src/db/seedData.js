@@ -304,6 +304,18 @@ const itemsData = [
         quantity: 2,
         code: "WIRE-REF",
         supplierIndex: 5
+    },
+    {
+        description: "Positive adjustment",
+        category: "other",
+        cost: 1,
+        code: "ADJ+"
+    },
+    {
+        description: "Negative adjustment",
+        category: "other",
+        cost: -1,
+        code: "ADJ-"
     }
 ]
 
@@ -319,6 +331,18 @@ const proceduresData = [
             "Is the area sufficiently barricaded?|y|0",
             "Have you signed onto all relevant permits?|y|0",
             "Record any additional safety measures required:|n|3"
+        ]
+    },
+    {
+        description: "Basic guillotine service",
+        category: "work",
+        procedure: [
+            "Apply grease to all grease points.|n|0",
+            "Check oil level in gearboxes and power pack.|n|0",
+            "Listen or feel for any air leaks.|n|0",
+            "Check accurate operation of back gauge.|n|0",
+            "Record any additional work performed:|y|4",
+            "Record any additional work required:|y|4"
         ]
     }
 ]
@@ -367,37 +391,40 @@ const routinesData = [
         ownerIndex: 3,
         ownerModel: 'Asset',
         next_WO_gen: '2020-10-01',
-        freq_WO_gen: '2.d',
+        freq_WO_gen_number: 2,
+        freq_WO_gen_unit: 'd',
         description: 'Research update delivery',
         procedure: [
-            "Look at things with great interest",
-            "Deliver a verbose and fantastical report on said things"
+            "Look at things with great interest|y|0",
+            "Deliver a verbose and fantastical report on said things|y|5"
         ]
     },
     {
         ownerIndex: 5,
         ownerModel: 'Asset',
         next_WO_gen: '2020-10-06',
-        freq_WO_gen: '12.w',
+        freq_WO_gen_number: 12,
+        freq_WO_gen_unit: 'w',
         description: 'Quarterly Quinjet service',
         procedureIndex: 1,
         procedure: [
-            "Change oil",
-            "Check brakes",
-            "Check tyre pressures",
-            "Check wing and prop condtions",
-            "Clean filters"
+            "Change oil|y|0",
+            "Check brakes|y|0",
+            "Check tyre pressures|y|0",
+            "Check wing and prop condtions|y|0",
+            "Clean filters|y|0"
         ]
     },
     {
         ownerIndex: 2,
         ownerModel: 'Component',
         next_WO_gen: '2020-09-29',
-        freq_WO_gen: '1.m',
+        freq_WO_gen_number: 1,
+        freq_WO_gen_unit: 'm',
         description: 'Regular drive defrag',
         procedure: [
-            "Restart computer",
-            "Run: CMD>Defrag"
+            "Restart computer|y|0",
+            "Run: CMD>Defrag|y|0"
         ]
     },
 ]

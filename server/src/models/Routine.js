@@ -1,9 +1,5 @@
 const mongoose = require('mongoose');
 
-const freqValidator = (val) => {
-    return /^(0{0,2}[1-9]|0?[1-9][0-9]|[1-9][0-9][0-9])(.)([dwmy])$/.test(val);
-}
-
 const schema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectID,
@@ -19,13 +15,16 @@ const schema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    freq_WO_gen: {
-        type: String,
-        validate: {
-            validator: freqValidator,
-            message: 'Invalid frequency format provided.'
-        },
+    freq_WO_gen_number: {
+        type: Number,
+        get: v => Math.round(v),
+        set: v => Math.round(v),
         required: true
+    },
+    freq_WO_gen_unit: {
+        type: String,
+        required: true,
+        enum: ['d', 'w', 'm', 'y']
     },
     description: {
         type: String,
