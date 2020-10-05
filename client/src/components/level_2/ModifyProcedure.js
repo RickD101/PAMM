@@ -9,6 +9,7 @@ import { Paper } from '@material-ui/core';
 import findOneCRUD from '../../api/crud/findOneCRUD';
 import ProcedureEditor from '../procedure/ProcedureEditor';
 import updateCRUD from '../../api/crud/updateCRUD';
+import NotificationModal from '../general/NotificationModal';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -39,6 +40,7 @@ export default function ModifyProcedure() {
 
     const [data, setData] = useState({description: '', category: '', procedure: []});
     const [dataPresent, setDataPresent] = useState(true);
+    const [modal, setModal] = useState({open: false, msg: '', status: ''});
 
     useEffect(() => {
         document.title = 'PAMM: Procedure Management';
@@ -65,7 +67,11 @@ export default function ModifyProcedure() {
             });
             if (response) {
                 if (response.status) {
-                    alert(response.msg);
+                    setModal({
+                        open: true,
+                        msg: 'Procedure successfully saved',
+                        status: 'good'
+                    });
                 }
                 else {
                     throw new Error(`${response.msg}`);
@@ -76,12 +82,22 @@ export default function ModifyProcedure() {
             }
         }
         catch (err) {
-            alert(err);
+            setModal({
+                open: true,
+                msg: err,
+                status: 'bad'
+            });
         }
     }
 
     return (
         <>
+        <NotificationModal
+            open={modal.open}
+            msg={modal.msg}
+            status={modal.status}
+            setModal={setModal}
+        />
         {dataPresent ?
             <div className={classes.root}>
                 <Grid container spacing={0}>

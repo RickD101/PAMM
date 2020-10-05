@@ -76,6 +76,23 @@ const generateWO = async (routine, date) => {
             scheduled: routine._id,
             procedure: routine.procedure
         });
+        data = await data.populate(
+            ['scheduled', 'labour.worker', 'materials.item']
+        ).execPopulate()
+        
+        if (data.ownerModel === 'Asset') {
+            data = await data.populate({
+                path: 'owner',
+                populate: { path: 'client' }
+            }).execPopulate()
+        }
+        else if (data.ownerModel === 'Component') {
+            data = await data.populate({
+                path: 'owner',
+                populate: { path: 'asset', populate: { path: 'client' } }
+            }).execPopulate();
+        }
+
         workOrders.push(JSON.parse(JSON.stringify(data)));
         routine.next_WO_gen.setDate(routine.next_WO_gen.getDate() + WOfreqDays);
     }

@@ -71,7 +71,6 @@ export default function ProcedureModal(props) {
     return (
         <Modal
             open={props.open}
-            onClose={props.onClose}
         >
             <div className={classes.root}>
                 <h3>Modify {props.description} procedure:</h3>

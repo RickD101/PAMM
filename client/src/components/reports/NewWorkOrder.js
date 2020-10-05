@@ -22,6 +22,7 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/picker
 import readCRUD from '../../api/crud/readCRUD';
 import TabContainer from './TabContainer';
 import createCRUD from '../../api/crud/createCRUD';
+import NotificationModal from '../general/NotificationModal';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -64,17 +65,6 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-// eslint-disable-next-line
-Date.prototype.yyyymmdd = function() {
-    var mm = this.getMonth() + 1;
-    var dd = this.getDate();
-  
-    return [this.getFullYear(),
-            (mm>9 ? '' : '0') + mm,
-            (dd>9 ? '' : '0') + dd
-           ].join('-');
-};
-
 export default function NewWorkOrder(props) {
     const classes = useStyles();
     const blank = {
@@ -85,8 +75,9 @@ export default function NewWorkOrder(props) {
         completed: false,
         description: '',
         expected_completion: new Date(),
-        actual_completion: new Date().yyyymmdd(),
+        actual_completion: new Date(),
     }
+    const blankErr = {client: false, owner: false, description: false}
 
     const [formState, setFormState] = useState(blank);
     const [procedure, setProcedure] = useState([]);
@@ -95,7 +86,9 @@ export default function NewWorkOrder(props) {
     const [cost, setCost] = useState({
         labourCost: 0,
         materialsCost: 0,
-    })
+    });
+    const [isError, setIsError] = useState(blankErr);
+    const [modal, setModal] = useState({open: false, msg: '', status: ''});
 
     const [clientData, setClientData] = useState([]);
     const [assetData, setAssetData] = useState([]);
@@ -139,32 +132,57 @@ export default function NewWorkOrder(props) {
     }, []);
 
     const saveForm = async () => {
-        try {
-            const response = await createCRUD({
-                model: 'WorkOrder',
-                data: {
-                    ...formState, 
-                    procedure: procedure, 
-                    labour: labour, 
-                    materials: materials
-                }
-            });
-            if (response) {
-                if (response.status) {
-                    resetForm();
-                    alert(response.msg);
+        if (validateForm()) {
+            try {
+                const response = await createCRUD({
+                    model: 'WorkOrder',
+                    data: {
+                        ...formState, 
+                        procedure: procedure, 
+                        labour: labour, 
+                        materials: materials
+                    }
+                });
+                if (response) {
+                    if (response.status) {
+                        resetForm();
+                        setModal({
+                            open: true,
+                            msg: 'Work order successfully saved',
+                            status: 'good'
+                        });
+                    }
+                    else {
+                        throw new Error(`${response.msg}`);
+                    }
                 }
                 else {
-                    throw new Error(`${response.msg}`);
+                    throw new Error(`The server failed to respond.`);
                 }
             }
-            else {
-                throw new Error(`The server failed to respond.`);
+            catch (err) {
+                setModal({
+                    open: true,
+                    msg: err,
+                    status: 'bad'
+                });
             }
         }
-        catch (err) {
-            alert(err);
+    }
+
+    const validateForm = () => {
+        let formValid = true;
+        let isErr = {...isError};
+
+        for (const key in isError) {
+            if (!formState[key]) {
+                isErr[key] = true;
+                formValid = false;
+            }
         }
+
+        setIsError(isErr);
+        return formValid;
     }
 
     const resetForm = () => {
@@ -173,10 +191,14 @@ export default function NewWorkOrder(props) {
         setLabour([]);
         setMaterials([]);
         setCost({labourCost: 0, materialsCost: 0,});
+        setIsError(blankErr);
     }
 
     const handleChange = (event) => {
         setFormState({ ...formState, [event.target.name]: event.target.value });
+        if (event.target.name === 'description') {
+            setIsError({...isError, [event.target.name]: false});
+        }
     };
 
     const handleClientChange = (event) => {
@@ -184,6 +206,7 @@ export default function NewWorkOrder(props) {
         newFormState.owner = '';
         newFormState.client = event.target.value;
         setFormState(newFormState);
+        setIsError({...isError, client: false});
     }
 
     const handleOwnerChange = (event) => {
@@ -191,6 +214,7 @@ export default function NewWorkOrder(props) {
         newFormState.ownerModel = event.currentTarget.getAttribute('ownermodel');
         newFormState.owner = event.target.value;
         setFormState(newFormState);
+        setIsError({...isError, owner: false});
     };
 
     const handleCheckboxChange = (event) => {
@@ -210,15 +234,21 @@ export default function NewWorkOrder(props) {
     }
 
     const handleECDateChange = (date) => {
-        setFormState({ ...formState, expected_completion: date.yyyymmdd() });
+        setFormState({ ...formState, expected_completion: date });
     };
 
     const handleACDateChange = (date) => {
-        setFormState({ ...formState, actual_completion: date.yyyymmdd() });
+        setFormState({ ...formState, actual_completion: date });
     };
 
     return (
         <>
+        <NotificationModal
+            open={modal.open}
+            msg={modal.msg}
+            status={modal.status}
+            setModal={setModal}
+        />
         <Grid
             container
             direction="row"
@@ -261,13 +291,14 @@ export default function NewWorkOrder(props) {
         >
             <Grid item xs={4}>
                 <FormControl className={classes.formControl}>
-                    <InputLabel shrink id="clientField-label">
+                    <InputLabel shrink id="clientField-label" error={isError.client}>
                         Client
                     </InputLabel>
                     <Select
                         labelId="clientField-label"
                         id="clientField"
                         name="client"
+                        error={isError.client}
                         value={formState.client}
                         onChange={handleClientChange}
                         displayEmpty
@@ -285,13 +316,14 @@ export default function NewWorkOrder(props) {
             </Grid>
             <Grid item xs={4}>
                 <FormControl className={classes.formControl}>
-                    <InputLabel shrink id="ownerField-label">
+                    <InputLabel shrink id="ownerField-label" error={isError.owner}>
                         Asset/Component
                     </InputLabel>
                     <Select
                         labelId="ownerField-label"
                         id="ownerField"
                         name="owner"
+                        error={isError.owner}
                         value={formState.owner}
                         onChange={handleOwnerChange}
                         displayEmpty
@@ -366,10 +398,12 @@ export default function NewWorkOrder(props) {
                         id="descriptionField"
                         name="description"
                         label="Work description"
-                        placeholder="Add work description here"
+                        placeholder="Add description here"
+                        error={isError.description}
                         value={formState.description}
                         onChange={handleChange}
                         className={classes.inputBox}
+                        InputLabelProps={{ shrink: true }}
                     />
                 </FormControl>
             </Grid>

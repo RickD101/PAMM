@@ -391,8 +391,8 @@ const routinesData = [
         ownerIndex: 3,
         ownerModel: 'Asset',
         next_WO_gen: '2020-10-01',
-        freq_WO_gen_number: 2,
-        freq_WO_gen_unit: 'd',
+        freq_WO_gen_number: 1,
+        freq_WO_gen_unit: 'w',
         description: 'Research update delivery',
         procedure: [
             "Look at things with great interest|y|0",
@@ -402,7 +402,7 @@ const routinesData = [
     {
         ownerIndex: 5,
         ownerModel: 'Asset',
-        next_WO_gen: '2020-10-06',
+        next_WO_gen: '2020-07-21',
         freq_WO_gen_number: 12,
         freq_WO_gen_unit: 'w',
         description: 'Quarterly Quinjet service',
@@ -425,6 +425,18 @@ const routinesData = [
         procedure: [
             "Restart computer|y|0",
             "Run: CMD>Defrag|y|0"
+        ]
+    },
+    {
+        ownerIndex: 1,
+        ownerModel: 'Asset',
+        next_WO_gen: '2020-10-14',
+        freq_WO_gen_number: 4,
+        freq_WO_gen_unit: 'd',
+        description: 'Count the sticks',
+        procedure: [
+            "Open box|y|0",
+            "Count the number of sticks you can see|y|0"
         ]
     },
 ]

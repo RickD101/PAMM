@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Clients() {
     const classes = useStyles();
 
-    const [windowState, setWindowState] = useState('blank') 
+    const [windowState, setWindowState] = useState('manageWorkOrders') 
 
     useEffect(() => {
         document.title = 'PAMM: Report Management';

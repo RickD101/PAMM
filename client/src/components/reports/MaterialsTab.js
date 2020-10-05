@@ -4,7 +4,6 @@ import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
 import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -72,20 +71,37 @@ export default function MaterialsTab(props) {
         cost: '',
         quantity: ''
     }
+    const blankErr = {item: false, cost: false, quantity: false}
 
     const [addEntryOpen, setAddEntryOpen] = useState(false);
     const [addEntryData, setAddEntryData] = useState(blank);
+    const [isError, setIsError] = useState(blankErr);
 
-    const saveEntryData = () => {
-        const materials = [...props.materials];
-        materials.push(addEntryData);
-        props.setMaterials(materials);
+    const saveEntryData = async () => {
+        let formValid = true;
+        let isErr = {...isError};
 
-        const cost = {...props.cost};
-        cost.materialsCost += parseFloat((addEntryData.cost*addEntryData.quantity).toFixed(2));
-        props.setCost(cost);
+        for (const key in isError) {
+            if (!addEntryData[key]) {
+                isErr[key] = true;
+                formValid = false;
+            }
+        }
 
-        setAddEntryData(blank);
+        setIsError(isErr);
+
+        if (formValid) {
+            const materials = [...props.materials];
+            materials.push(addEntryData);
+            props.setMaterials(materials);
+    
+            const cost = {...props.cost};
+            cost.materialsCost += parseFloat((addEntryData.cost*addEntryData.quantity).toFixed(2));
+            props.setCost(cost);
+    
+            setAddEntryOpen(false);
+            setAddEntryData(blank);
+        }
     }
 
     const deleteEntry = (index) => {
@@ -98,12 +114,9 @@ export default function MaterialsTab(props) {
         props.setCost(cost);
     }
 
-    const editEntry = (index) => {
-        alert('Still needs implementing!');
-    }
-
     const handleChange = (event) => {
         setAddEntryData({ ...addEntryData, [event.target.name]: event.target.value });
+        setIsError({...isError, [event.target.name]: false});
     }
 
     const handleItemChange = (event) => {
@@ -112,6 +125,7 @@ export default function MaterialsTab(props) {
         newAddEntryData.cost = event.currentTarget.getAttribute('cost');
         newAddEntryData.description = event.currentTarget.getAttribute('description');
         setAddEntryData(newAddEntryData);
+        setIsError({...isError, item: false, cost: false});
     }
 
     return (
@@ -122,13 +136,14 @@ export default function MaterialsTab(props) {
                     <ListSubheader className={classes.listHeader}>
                         <FormGroup row className={classes.addEntryBox}>
                             <FormControl className={classes.itemField}>
-                                <InputLabel shrink id="itemField-label">
+                                <InputLabel shrink id="itemField-label" error={isError.item}>
                                     Item
                                 </InputLabel>
                                 <Select
                                     labelId="itemField-label"
                                     id="itemField"
                                     name="item"
+                                    error={isError.item}
                                     value={addEntryData.item}
                                     onChange={handleItemChange}
                                     displayEmpty
@@ -176,22 +191,29 @@ export default function MaterialsTab(props) {
                                 </Select>
                             </FormControl>
                             <FormControl className={classes.costField}>
-                                <InputLabel htmlFor="costField">Cost per unit</InputLabel>
+                                <InputLabel htmlFor="costField" shrink error={isError.cost}>
+                                    Cost per unit
+                                </InputLabel>
                                 <Input
                                     id="costField"
                                     name="cost"
+                                    placeholder="0"
                                     readOnly
                                     startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                    error={isError.cost}
                                     value={addEntryData.cost}
                                     onChange={handleChange}
                                 />
                             </FormControl>
                             <FormControl className={classes.quantityField}>
-                                <InputLabel htmlFor="quantityField">Quantity</InputLabel>
+                                <InputLabel htmlFor="quantityField" shrink error={isError.quantity}>
+                                    Quantity
+                                </InputLabel>
                                 <Input
                                     id="quantityField"
                                     name="quantity"
                                     placeholder="0"
+                                    error={isError.quantity}
                                     value={addEntryData.quantity}
                                     onChange={handleChange}
                                 />
@@ -200,14 +222,18 @@ export default function MaterialsTab(props) {
                         <ListItemSecondaryAction>
                             <Tooltip title="Save">
                                 <IconButton
-                                    onClick={() => {setAddEntryOpen(false); saveEntryData()}}
+                                    onClick={saveEntryData}
                                 >
                                     <DoneIcon />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Cancel">
                                 <IconButton
-                                    onClick={() => {setAddEntryOpen(false); setAddEntryData('')}}
+                                    onClick={() => {
+                                        setAddEntryOpen(false); 
+                                        setAddEntryData(blank);
+                                        setIsError(blankErr);
+                                    }}
                                 >
                                     <CloseIcon />
                                 </IconButton>
@@ -238,11 +264,6 @@ export default function MaterialsTab(props) {
                         <ListItem key={`entry-${index+1}`} dense className={classes.step}>
                             <ListItemText>{entry.description}: {entry.quantity} @ ${parseFloat(entry.cost).toFixed(2)} totalling ${parseFloat(entry.cost*entry.quantity).toFixed(2)}</ListItemText>
                             <ListItemSecondaryAction>
-                                <Tooltip title="Edit">
-                                    <IconButton size="small" onClick={() => editEntry(index)}>
-                                        <EditIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
                                 <Tooltip title="Delete">
                                     <IconButton size="small" onClick={() => deleteEntry(index)}>
                                         <DeleteIcon fontSize="small" />

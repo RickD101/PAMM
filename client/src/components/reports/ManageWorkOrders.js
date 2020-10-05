@@ -7,11 +7,16 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PrintIcon from '@material-ui/icons/Print';
 import Tooltip from '@material-ui/core/Tooltip';
+import { Button, Slider, TextField } from '@material-ui/core';
+import MenuItem from '@material-ui/core/MenuItem';
+import UpdateIcon from '@material-ui/icons/Update';
 
 // inclusions
 import MaterialTableNonEdit from '../general/MaterialTableNonEdit';
 import readCRUD from '../../api/crud/readCRUD';
 import deleteCRUD from '../../api/crud/deleteCRUD';
+import NotificationModal from '../general/NotificationModal';
+import generateWorkOrders from '../../api/backendFunctions/generateWorkOrders';
 
 const useStyles = makeStyles((theme) => ({
     formTitle: {
@@ -30,12 +35,22 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         height: 45
     },
+    formButtons: {
+        textAlign: 'right',
+        color: 'black',
+        fontSize: '1.2rem',
+    },
+    selectField: {
+        width: '40%',
+        marginRight: 6,
+        textAlign: 'left',
+    },
     activeBadge: {
         display: 'inline-block',
         height: 12,
         width: 12,
         borderRadius: '50%',
-        backgroundColor: 'green'
+        backgroundColor: '#4caf50'
     },
     completedBadge: {
         display: 'inline-block',
@@ -50,8 +65,39 @@ const useStyles = makeStyles((theme) => ({
         width: 12,
         borderRadius: '50%',
         backgroundColor: 'lightgrey'
+    },
+    pastdueBadge: {
+        display: 'inline-block',
+        height: 12,
+        width: 12,
+        borderRadius: '50%',
+        backgroundColor: '#ff9800'
+    },
+    overdueBadge: {
+        display: 'inline-block',
+        height: 12,
+        width: 12,
+        borderRadius: '50%',
+        backgroundColor: '#f44336'
+    },
+    genButton: {
+        marginTop: 12
+    },
+    slider: {
+        marginTop: 12
+    },
+    buttonPadding: {
+        paddingLeft: 12
     }
 }));
+
+const cellStyle = {textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: 200}
+
+const dayDiff = (date) => {
+    const dt1 = new Date();
+    const dt2 = new Date(date);
+    return Math.floor((Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) - Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate()) ) /(1000 * 60 * 60 * 24));
+}
 
 export default function ManageWorkOrders(props) {
     const classes = useStyles();
@@ -61,15 +107,21 @@ export default function ManageWorkOrders(props) {
         {title: "id", field: "_id", hidden: true},
         {title: "active", field: "active", hidden: true},
         {title: "completed", field: "completed", hidden: true},
-        {title: "Client", field: "owner.client.name", render: rowData => determineStatusAndClient(rowData)},
-        {title: "Asset/Component", field: "owner.name"},
-        {title: "Description", field: "description"},
-        {title: "Due", field: "expected_completion", width: 80, type: "date"},
+        {title: "Client", render: rowData => determineStatusAndClient(rowData), cellStyle: cellStyle},
+        {title: "Asset/Component", field: "owner.name", cellStyle: cellStyle},
+        {title: "Description", field: "description", cellStyle: cellStyle},
+        {title: "Due", field: "expected_completion", width: 80, type: "date", defaultSort: "asc"},
         {title: "Actions", sorting: false, width: 120, render: rowData => renderButtons(rowData)}
     ];
 
     // table data
-    const [data, setData] = useState([]);
+    const [data, setData] = useState([{owner: {}}]);
+    const [filterData, setFilterData] = useState([]);
+
+    const [clientData, setClientData] = useState([]);
+    const [filter, setFilter] = useState({status: 'active', client: '(all)'});
+    const [modal, setModal] = useState({open: false, msg: '', status: ''});
+    const [daysToGen, setDaysToGen] = useState(7);
 
     const determineStatusAndClient = (data) => {
         let clientName = '';
@@ -80,14 +132,50 @@ export default function ManageWorkOrders(props) {
             clientName = data.owner.asset.client.name;
         }
 
-        if (data.active) {
-            return <><div className={classes.activeBadge}/> {clientName}</>
+        if (data.active && dayDiff(data.expected_completion) < -7) {
+            return (
+                <>
+                <Tooltip title="Overdue">
+                    <div className={classes.overdueBadge}/>
+                </Tooltip> {clientName}
+                </>
+            )
+        }
+        else if (data.active && dayDiff(data.expected_completion) < 0) {
+            return (
+                <>
+                <Tooltip title="Past due">
+                    <div className={classes.pastdueBadge}/>
+                </Tooltip> {clientName}
+                </>
+            )
+        }
+        else if (data.active) {
+            return (
+                <>
+                <Tooltip title="Active">
+                    <div className={classes.activeBadge}/>
+                </Tooltip> {clientName}
+                </>
+            )
         }
         else if (data.completed) {
-            return <><div className={classes.completedBadge}/> {clientName}</>
+            return (
+                <>
+                <Tooltip title="Completed">
+                    <div className={classes.completedBadge}/>
+                </Tooltip> {clientName}
+                </>
+            )
         }
         else {
-            return <><div className={classes.inactiveBadge}/> {clientName}</>
+            return (
+                <>
+                <Tooltip title="Inactive">
+                    <div className={classes.inactiveBadge}/>
+                </Tooltip> {clientName}
+                </>
+            )
         }
     }
 
@@ -130,11 +218,17 @@ export default function ManageWorkOrders(props) {
             });
             if (response) {
                 if (response.status) {
-                    alert(response.msg);
-                    const dataDelete = [...data];
-                    const index = oldData.tableData.id;
-                    dataDelete.splice(index, 1);
-                    setData([...dataDelete]);
+                    setModal({
+                        open: true,
+                        msg: 'Work order successfully deleted.',
+                        status: 'good'
+                    });
+                    
+                    const newDat = [...data].filter(dat => dat._id !== oldData._id);
+                    setData(newDat);
+
+                    const newFilterDat = [...filterData].filter(dat => dat._id !== oldData._id);
+                    setFilterData(newFilterDat);
                 }
                 else {
                     throw new Error(`${response.msg}`);
@@ -145,13 +239,168 @@ export default function ManageWorkOrders(props) {
             }
         }
         catch (err) {
+            setModal({
+                open: true,
+                msg: 'Something went wrong.',
+                status: 'bad'
+            });
+        }
+    }
+
+    const handleFilterChange = (event) => {
+        setFilter({...filter, [event.target.name]: event.target.value});
+        let compare;
+        let newFilterData;
+        if (event.target.name === 'status'){
+            newFilterData = data.filter(entry => {
+                if (entry.active) {
+                    compare = 'active'
+                }
+                else if (entry.completed) {
+                    compare = 'completed'
+                }
+                else {
+                    compare = 'inactive'
+                }
+    
+                if (event.target.value !== '(all)') {
+                    return compare === event.target.value;
+                }
+                else {
+                    return entry;
+                }
+            }).filter(entry => {
+                if (filter.client !== '(all)') {
+                    let clientID = '';
+                    if (entry.owner.client) {
+                        clientID = entry.owner.client._id;
+                    }
+                    else if (entry.owner.asset) {
+                        clientID = entry.owner.asset.client._id;
+                    }
+                    return clientID === filter.client;
+                }
+                else {
+                    return entry;
+                }
+            });
+        }
+        else if (event.target.name === 'client'){
+            newFilterData = data.filter(entry => {
+                if (entry.active) {
+                    compare = 'active'
+                }
+                else if (entry.completed) {
+                    compare = 'completed'
+                }
+                else {
+                    compare = 'inactive'
+                }
+    
+                if (filter.status !== '(all)') {
+                    return compare === filter.status;
+                }
+                else {
+                    return entry;
+                }
+            }).filter(entry => {
+                if (event.target.value !== '(all)') {
+                    let clientID = '';
+                    if (entry.owner.client) {
+                        clientID = entry.owner.client._id;
+                    }
+                    else if (entry.owner.asset) {
+                        clientID = entry.owner.asset.client._id;
+                    }
+                    return clientID === event.target.value;
+                }
+                else {
+                    return entry;
+                }
+            });
+        }
+        
+        setFilterData(newFilterData);
+    }
+
+    const performFilter = (dataToFilter) => {
+        let compare;
+        return dataToFilter.filter(entry => {
+            if (filter.status !== '(all)') {
+                if (entry.active) {
+                    compare = 'active'
+                }
+                else if (entry.completed) {
+                    compare = 'completed'
+                }
+                else {
+                    compare = 'inactive'
+                }
+                return compare === filter.status;
+            }
+            else {
+                return entry;
+            }
+        }).filter(entry => {
+            if (filter.client !== '(all)') {
+                let clientID = '';
+                if (entry.owner.client) {
+                    clientID = entry.owner.client._id;
+                }
+                else if (entry.owner.asset) {
+                    clientID = entry.owner.asset.client._id;
+                }
+                return clientID === filter.client;
+            }
+            else {
+                return entry;
+            }
+        });
+    }
+
+    const handleSliderChange = (event, newVal) => {
+        setDaysToGen(newVal);
+    }
+
+    const sendGenRequest = async () => {
+        try {
+            const response = await generateWorkOrders(daysToGen);
+            if (response.status) {
+                setModal({
+                    open: true,
+                    msg: response.msg,
+                    status: 'good'
+                });
+                setData([...data, ...response.data]);
+                const fData = performFilter(response.data);
+                setFilterData([...filterData, ...fData])
+            }
+            else {
+                setModal({
+                    open: true,
+                    msg: response.msg,
+                    status: 'bad'
+                });
+            }
+        }
+        catch (err) {
             alert(err);
         }
     }
 
     useEffect(() => {
         readCRUD({model: "WorkOrder"}).then((response)=>{
-            setData(response.data);
+            if (response.status) {
+                setData(response.data);
+                const fData = response.data.filter(entry => entry.active === true);
+                setFilterData(fData);
+            }
+        }).catch((err)=>{
+            alert(err);
+        })
+
+        readCRUD({model: "Client"}).then((response)=>{
+            setClientData(response.data);
         }).catch((err)=>{
             alert(err);
         })
@@ -159,18 +408,63 @@ export default function ManageWorkOrders(props) {
 
     return (
         <>
+        <NotificationModal
+            open={modal.open}
+            msg={modal.msg}
+            status={modal.status}
+            setModal={setModal}
+        />
         <Grid
             container
             direction="row"
-            justify="center"
+            justify="flex-end"
             alignItems="center"
             className={classes.topBar}
         >
-            <Grid item xs={6} className={classes.formTitle}>
+            <Grid item xs={5} className={classes.formTitle}>
                 Manage existing work orders
             </Grid>
-            <Grid item xs={6}>
-                
+            <Grid item xs={7} className={classes.formButtons}>
+                <TextField
+                    className={classes.selectField}
+                    id="statusFilter"
+                    name="status"
+                    select
+                    label="Filter by status"
+                    value={filter.status}
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                    onChange={handleFilterChange}
+                    variant="outlined"
+                >
+                    <MenuItem value="(all)">
+                        <em>(all)</em>
+                    </MenuItem>
+                    {['active', 'inactive', 'completed'].map(status => (
+                        <MenuItem key={status} value={status}>{status}</MenuItem>
+                    ))}
+                </TextField>
+
+                <TextField
+                    className={classes.selectField}
+                    id="clientFilter"
+                    name="client"
+                    select
+                    label="Filter by client"
+                    value={filter.client}
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                    onChange={handleFilterChange}
+                    variant="outlined"
+                >
+                    <MenuItem value="(all)">
+                        <em>(all)</em>
+                    </MenuItem>
+                    {clientData &&
+                    clientData.map(client => (
+                        <MenuItem key={client._id} value={client._id}>{client.name}</MenuItem>
+                    ))}
+                </TextField>
             </Grid>
         </Grid>
         
@@ -179,9 +473,39 @@ export default function ManageWorkOrders(props) {
         <MaterialTableNonEdit
             title={'Work orders'}
             columns={columns}
-            data={data}
+            data={filterData}
             pageSize={8}
         />
+
+        <Grid
+            container
+            direction="row"
+            justify="flex-end"
+            alignItems="center"
+        >
+            <Grid item xs={7}>
+                <Slider
+                    className={classes.slider}
+                    value={daysToGen}
+                    onChange={handleSliderChange}
+                    step={1}
+                    min={1}
+                    max={365}
+                />
+            </Grid>
+            <Grid item xs={5} className={classes.buttonPadding}>
+                <Button
+                    className={classes.genButton}
+                    variant="contained"
+                    color="primary"
+                    onClick={sendGenRequest}
+                    endIcon={<UpdateIcon />}
+                    fullWidth
+                >
+                    Generate work orders for {daysToGen} {daysToGen === 1 ? 'day' : 'days'}
+                </Button>
+            </Grid>
+        </Grid>
         </>
     )
 }

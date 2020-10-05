@@ -67,16 +67,6 @@ export default function ReportsMenu(props) {
                 <List component="div" disablePadding>
                     <ListItem 
                         button 
-                        className={isActiveClass('newWorkOrder')}
-                        onClick={() => props.setWindowState('newWorkOrder')}
-                    >
-                        <ListItemIcon>
-                                <AddToPhotosIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="New work order" />
-                    </ListItem>
-                    <ListItem 
-                        button 
                         className={isActiveClass('manageWorkOrders')}
                         onClick={() => props.setWindowState('manageWorkOrders')}
                     >
@@ -84,6 +74,16 @@ export default function ReportsMenu(props) {
                                 <AssignmentTurnedInIcon />
                         </ListItemIcon>
                         <ListItemText primary="Manage work orders" />
+                    </ListItem>
+                    <ListItem 
+                        button 
+                        className={isActiveClass('newWorkOrder')}
+                        onClick={() => props.setWindowState('newWorkOrder')}
+                    >
+                        <ListItemIcon>
+                                <AddToPhotosIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="New work order" />
                     </ListItem>
                     <ListItem 
                         button
