@@ -106,10 +106,15 @@ const generateWO = async (routine, date) => {
 
 const periodValidator = (period) => {
     if (parseInt(period)) {
-        return parseInt(period)
+        if (parseInt(period) >= 1 && parseInt(period) <= 365) {
+            return parseInt(period)
+        }
+        else {
+            throw {message: 'Generation period must be between 1 and 365 days.'}
+        }
     }
     else {
-        throw {message: 'Invalid period specified.'}
+        throw {message: 'Invalid period format specified.'}
     }
 }
 

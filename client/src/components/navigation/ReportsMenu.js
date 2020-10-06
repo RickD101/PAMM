@@ -12,6 +12,7 @@ import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
+import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -75,6 +76,7 @@ export default function ReportsMenu(props) {
                         </ListItemIcon>
                         <ListItemText primary="Manage work orders" />
                     </ListItem>
+
                     <ListItem 
                         button 
                         className={isActiveClass('newWorkOrder')}
@@ -85,6 +87,18 @@ export default function ReportsMenu(props) {
                         </ListItemIcon>
                         <ListItemText primary="New work order" />
                     </ListItem>
+
+                    <ListItem 
+                        button 
+                        className={isActiveClass('editWorkOrder')}
+                        onClick={() => props.setWindowState('editWorkOrder')}
+                    >
+                        <ListItemIcon>
+                                <EditIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Edit work order" />
+                    </ListItem>
+
                     <ListItem 
                         button
                         className={isActiveClass('workOrderSummary')}

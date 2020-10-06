@@ -6,7 +6,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import SaveIcon from '@material-ui/icons/Save';
-import DeleteIcon from '@material-ui/icons/Delete';
+import CancelIcon from '@material-ui/icons/Cancel';
+import AssignmentReturnIcon from '@material-ui/icons/AssignmentReturn';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -21,8 +22,9 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/picker
 // inclusions
 import readCRUD from '../../api/crud/readCRUD';
 import TabContainer from './TabContainer';
-import createCRUD from '../../api/crud/createCRUD';
+import updateCRUD from '../../api/crud/updateCRUD';
 import NotificationModal from '../general/NotificationModal';
+import findOneCRUD from '../../api/crud/findOneCRUD';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -65,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function NewWorkOrder(props) {
+export default function EditWorkOrder(props) {
     const classes = useStyles();
     const blank = {
         client: '',
@@ -129,13 +131,59 @@ export default function NewWorkOrder(props) {
         }).catch((err)=>{
             alert(err);
         })
+
+        retrieveWorkOrderData();
+
     }, []);
+
+    const retrieveWorkOrderData = () => {
+        if (props.workOrderID) {
+            findOneCRUD({model: "WorkOrder", id: props.workOrderID}).then((response)=>{
+                if (response.status) {
+                    const setData = {...blank}
+                    for (const key in setData) {
+                        setData[key] = response.data[key];
+                    }
+
+                    if (response.data.ownerModel === 'Asset') {
+                        setData.client = response.data.owner.client._id
+                    }
+                    else if (response.data.ownerModel === 'Component') {
+                        setData.client = response.data.owner.asset.client._id
+                    }
+
+                    setData.owner = response.data.owner._id;
+
+                    const newCost = {...cost};
+                    response.data.labour.forEach(entry => {
+                        newCost.labourCost += entry.hours*entry.rate*entry.multiplier;
+                    });
+                    response.data.materials.forEach(entry => {
+                        newCost.materialsCost += entry.cost*entry.quantity
+                    });
+                    setCost(newCost);
+
+                    setFormState(setData);
+                    setProcedure(response.data.procedure);
+                    setLabour(response.data.labour);
+                    setMaterials(response.data.materials);
+                }
+                else {
+                    alert(response.msg);
+                    props.setWorkOrderID('');
+                }
+            }).catch((err)=>{
+                alert(err);
+            })
+        }
+    }
 
     const saveForm = async () => {
         if (validateForm()) {
             try {
-                const response = await createCRUD({
+                const response = await updateCRUD({
                     model: 'WorkOrder',
+                    id: props.workOrderID,
                     data: {
                         ...formState, 
                         procedure: procedure, 
@@ -145,10 +193,9 @@ export default function NewWorkOrder(props) {
                 });
                 if (response) {
                     if (response.status) {
-                        resetForm();
                         setModal({
                             open: true,
-                            msg: 'Work order successfully saved.',
+                            msg: 'Work order successfully updated.',
                             status: 'good'
                         });
                     }
@@ -182,12 +229,12 @@ export default function NewWorkOrder(props) {
     }
 
     const resetForm = () => {
-        setFormState(blank);
-        setProcedure([]);
-        setLabour([]);
-        setMaterials([]);
-        setCost({labourCost: 0, materialsCost: 0,});
+        retrieveWorkOrderData();
         setIsError(blankErr);
+    }
+
+    const returnToManage = () => {
+        props.setWindowState('manageWorkOrders');
     }
 
     const handleChange = (event) => {
@@ -253,30 +300,48 @@ export default function NewWorkOrder(props) {
             className={classes.topBar}
         >
             <Grid item xs={6} className={classes.formTitle}>
-                Create new work order
+                Edit existing work order
             </Grid>
             <Grid item xs={6} className={classes.formButtons}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.button}
-                    startIcon={<SaveIcon />}
-                    onClick={saveForm}
-                >
-                    Save
-                </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    className={classes.button}
-                    startIcon={<DeleteIcon />}
-                    onClick={resetForm}
-                >
-                    Clear
-                </Button>
+                {props.workOrderID ?
+                    <>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.button}
+                        startIcon={<SaveIcon />}
+                        onClick={saveForm}
+                    >
+                        Save
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        className={classes.button}
+                        startIcon={<CancelIcon />}
+                        onClick={resetForm}
+                    >
+                        Cancel
+                    </Button>
+                    </>
+                    :
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.button}
+                        startIcon={<AssignmentReturnIcon />}
+                        onClick={returnToManage}
+                    >
+                        Manage work orders
+                    </Button>
+                }
+                
             </Grid>
         </Grid>
         <div className={classes.spacer}></div>
+
+        {props.workOrderID ?
+        <>
         <Paper className={classes.paper}>
         <Grid
             container
@@ -465,6 +530,11 @@ export default function NewWorkOrder(props) {
                 setCost={setCost}
             />   
         </Grid>
+        </>
+        :
+        <h2 style={{marginTop: 220}}>Select a work order to edit from the Manage work orders screen</h2>
+        }
+
         </>
     )
 }

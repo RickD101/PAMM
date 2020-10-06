@@ -96,7 +96,7 @@ export default function MaterialsTab(props) {
             props.setMaterials(materials);
     
             const cost = {...props.cost};
-            cost.materialsCost += parseFloat((addEntryData.cost*addEntryData.quantity).toFixed(2));
+            cost.materialsCost += addEntryData.cost*addEntryData.quantity;
             props.setCost(cost);
     
             setAddEntryOpen(false);
@@ -110,7 +110,7 @@ export default function MaterialsTab(props) {
         props.setMaterials(materials);
 
         const cost = {...props.cost};
-        cost.materialsCost -= parseFloat((removedData[0].cost*removedData[0].quantity).toFixed(2));
+        cost.materialsCost -= removedData[0].cost*removedData[0].quantity;
         props.setCost(cost);
     }
 

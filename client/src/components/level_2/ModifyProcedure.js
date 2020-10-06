@@ -69,7 +69,7 @@ export default function ModifyProcedure() {
                 if (response.status) {
                     setModal({
                         open: true,
-                        msg: 'Procedure successfully saved',
+                        msg: 'Procedure successfully saved.',
                         status: 'good'
                     });
                 }
@@ -82,11 +82,7 @@ export default function ModifyProcedure() {
             }
         }
         catch (err) {
-            setModal({
-                open: true,
-                msg: err,
-                status: 'bad'
-            });
+            alert(err);
         }
     }
 

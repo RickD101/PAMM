@@ -8,6 +8,7 @@ import Paper from '@material-ui/core/Paper';
 // inclusions
 import ReportsMenu from '../navigation/ReportsMenu';
 import NewWorkOrder from '../reports/NewWorkOrder';
+import EditWorkOrder from '../reports/EditWorkOrder';
 import ManageWorkOrders from '../reports/ManageWorkOrders';
 import WorkOrderSummary from '../reports/WorkOrderSummary';
 
@@ -30,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
 export default function Clients() {
     const classes = useStyles();
 
-    const [windowState, setWindowState] = useState('manageWorkOrders') 
+    const [windowState, setWindowState] = useState('manageWorkOrders');
+    const [workOrderID, setWorkOrderID] = useState('');
 
     useEffect(() => {
         document.title = 'PAMM: Report Management';
@@ -56,17 +58,27 @@ export default function Clients() {
                         <Grid container>
                             <ReportsMenu windowState={windowState} setWindowState={setWindowState}/>
                             <Grid item className={classes.reportWindow}>
-                                {windowState === 'blank' &&
-                                    <h1 style={{marginTop: 250}}>Select an option</h1>
+                                {windowState === '' &&
+                                    <h2 style={{marginTop: 250}}>Select an option</h2>
                                 }
                                 {windowState === 'newWorkOrder' &&
                                     <NewWorkOrder />
                                 }
                                 {windowState === 'manageWorkOrders' &&
-                                    <ManageWorkOrders />
+                                    <ManageWorkOrders 
+                                        setWorkOrderID={setWorkOrderID}
+                                        setWindowState={setWindowState}
+                                    />
                                 }
                                 {windowState === 'workOrderSummary' &&
                                     <WorkOrderSummary />
+                                }
+                                {windowState === 'editWorkOrder' &&
+                                    <EditWorkOrder 
+                                        workOrderID={workOrderID} 
+                                        setWorkOrderID={setWorkOrderID}
+                                        setWindowState={setWindowState}
+                                    />
                                 }
                             </Grid>
                         </Grid>

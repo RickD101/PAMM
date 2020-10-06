@@ -202,11 +202,11 @@ export default function ManageWorkOrders(props) {
     }
 
     const editWorkOrder = (data) => {
-        alert('Coming soon...');
+        props.setWorkOrderID(data._id);
+        props.setWindowState('editWorkOrder');
     }
 
     const printWorkOrder = (data) => {
-        console.log(data);
         alert('Coming soon...');
     }
 
