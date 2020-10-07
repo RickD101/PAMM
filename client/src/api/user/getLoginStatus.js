@@ -7,7 +7,7 @@ const getLoginStatus = async () => {
             credentials: 'same-origin'
         });
         const data = await response.json();
-        return data.status;
+        return data;
     }
     catch (err) {
         console.log(err);

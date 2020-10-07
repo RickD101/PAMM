@@ -8,6 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AssignmentReturnIcon from '@material-ui/icons/AssignmentReturn';
+import UndoIcon from '@material-ui/icons/Undo';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -234,6 +235,7 @@ export default function EditWorkOrder(props) {
     }
 
     const returnToManage = () => {
+        props.setWorkOrderID('');
         props.setWindowState('manageWorkOrders');
     }
 
@@ -316,10 +318,19 @@ export default function EditWorkOrder(props) {
                     </Button>
                     <Button
                         variant="contained"
+                        color="primary"
+                        className={classes.button}
+                        startIcon={<UndoIcon />}
+                        onClick={resetForm}
+                    >
+                        Undo
+                    </Button>
+                    <Button
+                        variant="contained"
                         color="secondary"
                         className={classes.button}
                         startIcon={<CancelIcon />}
-                        onClick={resetForm}
+                        onClick={returnToManage}
                     >
                         Cancel
                     </Button>

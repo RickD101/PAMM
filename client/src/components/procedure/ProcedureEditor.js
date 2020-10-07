@@ -5,6 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ProcedureSteps from './ProcedureSteps';
 import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -100,6 +101,15 @@ export default function ProcedureEditor(props) {
                         Cancel
                     </Button>
                 </Link>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    className={classes.button}
+                    startIcon={<VisibilityIcon />}
+                    onClick={() => props.setPreview()}
+                >
+                    Preview
+                </Button>
             </Grid>
         </Grid>
         </>

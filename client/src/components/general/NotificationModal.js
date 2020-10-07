@@ -28,7 +28,7 @@ export default function NotificationModal(props) {
     const classes = useStyles();
 
     const handleClose = () => {
-        props.setModal({open: false, msg:''});
+        props.setModal({open: false, msg: '', status: ''});
     };
 
     return (

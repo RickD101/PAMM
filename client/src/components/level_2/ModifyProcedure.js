@@ -10,6 +10,7 @@ import findOneCRUD from '../../api/crud/findOneCRUD';
 import ProcedureEditor from '../procedure/ProcedureEditor';
 import updateCRUD from '../../api/crud/updateCRUD';
 import NotificationModal from '../general/NotificationModal';
+import WorkOrderPreview from '../reports/PDF/WorkOrderPreview';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -30,15 +31,22 @@ const useStyles = makeStyles((theme) => ({
     displayPaneRight: {
         height: 600,
         marginLeft: 6,
-        backgroundColor: 'whitesmoke'
+    },
+    preview: {
+        height: '100%',
+        width: '100%',
+        boxSizing: 'border-box',
+        borderRadius: 4
     }
 }));
 
-export default function ModifyProcedure() {
+export default function ModifyProcedure(props) {
     const classes = useStyles();
     const { id } = useParams();
 
     const [data, setData] = useState({description: '', category: '', procedure: []});
+    const [previewData, setPreviewData] = useState([]);
+    const [previewReady, setPreviewReady] = useState(false);
     const [dataPresent, setDataPresent] = useState(true);
     const [modal, setModal] = useState({open: false, msg: '', status: ''});
 
@@ -48,6 +56,7 @@ export default function ModifyProcedure() {
         findOneCRUD({model: "Procedure", id: id}).then((response)=>{
             if (response.status){
                 setData(response.data);
+                setPreviewData(response.data.procedure);
             }
             else {
                 alert('Procedure does not exist, redirecting to home...');
@@ -86,6 +95,11 @@ export default function ModifyProcedure() {
         }
     }
 
+    const setPreview = () => {
+        setPreviewReady(false);
+        setPreviewData([...data.procedure]);
+    }
+
     return (
         <>
         <NotificationModal
@@ -118,12 +132,17 @@ export default function ModifyProcedure() {
                                 data={data} 
                                 setData={setData}
                                 saveProcedure={saveProcedure}
+                                setPreview={setPreview}
                             />
                         </Paper>
                     </Grid>
                     <Grid item xs={4}>
                         <Paper className={classes.displayPaneRight} elevation={3}>
-                            
+                            <WorkOrderPreview 
+                                procedure={previewData}
+                                previewReady={previewReady}
+                                setPreviewReady={setPreviewReady}
+                            />
                         </Paper>
                     </Grid>
                     <Grid item xs={1}></Grid>

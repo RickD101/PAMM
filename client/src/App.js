@@ -26,8 +26,10 @@ export default function App() {
     const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
-        getLoginStatus().then((status) => {
-            setLoginStatus(status);
+        getLoginStatus().then((response) => {
+            setLoginStatus(response.status);
+        }).catch((err)=>{
+            alert(err);
         });
     });
 

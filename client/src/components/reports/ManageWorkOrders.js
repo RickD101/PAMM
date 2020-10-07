@@ -17,6 +17,7 @@ import readCRUD from '../../api/crud/readCRUD';
 import deleteCRUD from '../../api/crud/deleteCRUD';
 import NotificationModal from '../general/NotificationModal';
 import generateWorkOrders from '../../api/backendFunctions/generateWorkOrders';
+import ConfirmationModal from '../general/ConfirmationModal';
 
 const useStyles = makeStyles((theme) => ({
     formTitle: {
@@ -120,7 +121,8 @@ export default function ManageWorkOrders(props) {
 
     const [clientData, setClientData] = useState([]);
     const [filter, setFilter] = useState({status: 'active', client: '(all)'});
-    const [modal, setModal] = useState({open: false, msg: '', status: ''});
+    const [notificationModal, setNotificationModal] = useState({open: false, msg: '', status: ''});
+    const [confirmationModal, setConfirmationModal] = useState({open: false, msg: '', confirmFunction: ''})
     const [daysToGen, setDaysToGen] = useState(7);
 
     const determineStatusAndClient = (data) => {
@@ -193,7 +195,7 @@ export default function ManageWorkOrders(props) {
                 </IconButton>
             </Tooltip>
             <Tooltip title="Delete">
-                <IconButton size="small" onClick={() => {deleteWorkOrder(data)}}>
+                <IconButton size="small" onClick={() => {deletePrompt(data)}}>
                     <DeleteIcon fontSize="small" />
                 </IconButton>
             </Tooltip>
@@ -210,6 +212,14 @@ export default function ManageWorkOrders(props) {
         alert('Coming soon...');
     }
 
+    const deletePrompt = (data) => {
+        setConfirmationModal({
+            open: true,
+            msg: 'Are you sure you want to delete this work order?',
+            confirmFunction: () => {deleteWorkOrder(data)}
+        })
+    }
+
     const deleteWorkOrder = async (oldData) => {
         try {
             const response = await deleteCRUD({
@@ -218,7 +228,7 @@ export default function ManageWorkOrders(props) {
             });
             if (response) {
                 if (response.status) {
-                    setModal({
+                    setNotificationModal({
                         open: true,
                         msg: 'Work order successfully deleted.',
                         status: 'good'
@@ -239,7 +249,7 @@ export default function ManageWorkOrders(props) {
             }
         }
         catch (err) {
-            setModal({
+            setNotificationModal({
                 open: true,
                 msg: 'Something went wrong.',
                 status: 'bad'
@@ -366,7 +376,7 @@ export default function ManageWorkOrders(props) {
         try {
             const response = await generateWorkOrders(daysToGen);
             if (response.status) {
-                setModal({
+                setNotificationModal({
                     open: true,
                     msg: response.msg,
                     status: 'good'
@@ -376,7 +386,7 @@ export default function ManageWorkOrders(props) {
                 setFilterData([...filterData, ...fData])
             }
             else {
-                setModal({
+                setNotificationModal({
                     open: true,
                     msg: response.msg,
                     status: 'bad'
@@ -409,10 +419,16 @@ export default function ManageWorkOrders(props) {
     return (
         <>
         <NotificationModal
-            open={modal.open}
-            msg={modal.msg}
-            status={modal.status}
-            setModal={setModal}
+            open={notificationModal.open}
+            msg={notificationModal.msg}
+            status={notificationModal.status}
+            setModal={setNotificationModal}
+        />
+        <ConfirmationModal
+            open={confirmationModal.open}
+            msg={confirmationModal.msg}
+            confirmFunction={confirmationModal.confirmFunction}
+            setModal={setConfirmationModal}
         />
         <Grid
             container
