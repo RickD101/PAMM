@@ -121,6 +121,13 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         boxSizing: 'border-box',
         borderRadius: 4
+    },
+    loadingText: {
+        textAlign: 'center',
+        paddingTop: 32,
+        fontFamily: 'Times, serif',
+        fontSize: '1.2rem',
+        fontWeight: 'bold'
     }
 }));
 
@@ -157,7 +164,7 @@ const WorkOrderPreview = React.memo((props) => {
             }
             setProcedure(renderProcedure);
             props.setPreviewReady(true);
-        }, 1000)
+        }, 1000);
     }, [props]);
 
     const renderStep = (step) => {
@@ -271,7 +278,7 @@ const WorkOrderPreview = React.memo((props) => {
             </Document>
         </PDFViewer>
         :
-        <div>Loading...</div>
+        <div className={classes.loadingText}>Loading...</div>
         }
         </>
     )

@@ -18,6 +18,7 @@ import deleteCRUD from '../../api/crud/deleteCRUD';
 import NotificationModal from '../general/NotificationModal';
 import generateWorkOrders from '../../api/backendFunctions/generateWorkOrders';
 import ConfirmationModal from '../general/ConfirmationModal';
+import DisplayModal from '../general/DisplayModal';
 
 const useStyles = makeStyles((theme) => ({
     formTitle: {
@@ -122,7 +123,8 @@ export default function ManageWorkOrders(props) {
     const [clientData, setClientData] = useState([]);
     const [filter, setFilter] = useState({status: 'active', client: '(all)'});
     const [notificationModal, setNotificationModal] = useState({open: false, msg: '', status: ''});
-    const [confirmationModal, setConfirmationModal] = useState({open: false, msg: '', confirmFunction: ''})
+    const [confirmationModal, setConfirmationModal] = useState({open: false, msg: '', confirmFunction: ''});
+    const [displayModal, setDisplayModal] = useState({open: false, data: {}});
     const [daysToGen, setDaysToGen] = useState(7);
 
     const determineStatusAndClient = (data) => {
@@ -184,12 +186,12 @@ export default function ManageWorkOrders(props) {
     const renderButtons = (data) => {
         return(
             <>
-            <Tooltip title="View/Edit">
+            <Tooltip title="Edit">
                 <IconButton size="small" onClick={() => {editWorkOrder(data)}}>
                     <EditIcon fontSize="small" />
                 </IconButton>
             </Tooltip>
-            <Tooltip title="Print">
+            <Tooltip title="View/Print">
                 <IconButton size="small" onClick={() => {printWorkOrder(data)}}>
                     <PrintIcon fontSize="small" />
                 </IconButton>
@@ -209,7 +211,38 @@ export default function ManageWorkOrders(props) {
     }
 
     const printWorkOrder = (data) => {
-        alert('Coming soon...');
+        const renderData = {};
+        if (data.ownerModel === 'Asset') {
+            renderData.client = data.owner.client.name;
+            renderData.asset = data.owner.name + ' (' + data.owner.code + ')';
+            renderData.component = '-';
+        }
+        else if (data.ownerModel === 'Component') {
+            renderData.client = data.owner.asset.client.name;
+            renderData.asset = data.owner.asset.name + ' (' + data.owner.asset.code + ')';
+            renderData.component = data.owner.name + ' (' + data.owner.code + ')';
+        }
+
+        if (data.completed) {
+            const acDate = new Date(data.actual_completion)
+            renderData.actual_completion = `${acDate.getDate()}/${acDate.getMonth() + 1}/${acDate.getFullYear()}`;
+        }
+        const ecDate = new Date(data.expected_completion)
+        renderData.expected_completion = `${ecDate.getDate()}/${ecDate.getMonth() + 1}/${ecDate.getFullYear()}`;
+
+        if (data.scheduled) {
+            renderData.scheduled = data.scheduled.freq_WO_gen_number + data.scheduled.freq_WO_gen_unit;
+        }
+
+        renderData.description = data.description;
+
+        if (data.procedure) {
+            renderData.procedure = data.procedure;
+        }
+        else {
+            renderData.procedure = [];
+        }
+        setDisplayModal({open: true, data: renderData});
     }
 
     const deletePrompt = (data) => {
@@ -429,6 +462,11 @@ export default function ManageWorkOrders(props) {
             msg={confirmationModal.msg}
             confirmFunction={confirmationModal.confirmFunction}
             setModal={setConfirmationModal}
+        />
+        <DisplayModal
+            open={displayModal.open}
+            data={displayModal.data}
+            setModal={setDisplayModal}
         />
         <Grid
             container
