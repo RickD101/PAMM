@@ -1,6 +1,11 @@
+// inclusions
 const express = require('express');
 const bcrypt  = require('bcryptjs');
 const router  = express.Router();
+const auth    = require('../auth');
+
+// auth middleware
+router.use(auth);
 
 // model inclusions
 const User = require('../models/User');

@@ -32,19 +32,6 @@ app.use(session({               // session middleware
     store: new MongoStore({mongooseConnection: mongoose.connection})
 }));
 
-// auth check
-app.use((req, res, next) => {
-    if (req.session.user || req.path == '/user/login' || req.path == '/user') {
-        next();
-    }
-    else {
-        res.status(401).send({
-            status: false,
-            msg: 'Please login to access.'
-        });
-    }
-});
-
 // routes
 app.use('/user', userRouter);
 app.use('/crud', crudRouter);

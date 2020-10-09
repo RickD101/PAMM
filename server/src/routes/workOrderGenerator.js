@@ -1,6 +1,10 @@
 // package inclusions
 const express = require('express');
-const router = express.Router();
+const router  = express.Router();
+const auth    = require('../auth');
+
+// auth middleware
+router.use(auth);
 
 // functional inclusions
 const generateAllWO = require('./nested_functions/generateAllWO');
