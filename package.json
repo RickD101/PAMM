@@ -1,6 +1,6 @@
 {
   "scripts": {
     "build": "sh ./build.sh",
-    "start": "cd backend && node ./server.js"
+    "start": "cd server && node ./src/index.js"
   }
 }

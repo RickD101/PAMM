@@ -3,6 +3,7 @@ const express    = require('express');
 const session    = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const consts     = require('./consts');
+const cors       = require('cors');
 const mongoose   = require('./db/mongo'); // server setup JS inclusion
 
 // set app

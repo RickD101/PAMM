@@ -3,11 +3,14 @@ const mongoose = require('mongoose');
 const consts  = require('../consts');
 
 let uri;
+let db;
 if (consts.environment === 'production') {
     uri = consts.dbProd;
+    db = 'PAMM_Prod';
 }
 else {
     uri = `${consts.dbPath}${consts.dbName}`;
+    db = consts.dbName;
 }
 
 mongoose.connect(uri, {
@@ -18,7 +21,7 @@ mongoose.connect(uri, {
 });
 
 mongoose.connection.on('connected', () => {
-    console.log(`Mongoose connected to ${consts.dbName}`)
+    console.log(`Mongoose connected to ${db}`)
 });
   
 mongoose.connection.on('error', (err) => {

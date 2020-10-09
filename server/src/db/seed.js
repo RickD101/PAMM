@@ -20,7 +20,18 @@ const data = require(`./${consts.seedFile}`);
 
 const models = [Client, Item, Supplier, Worker, Asset, Component, Routine, Procedure, WorkOrder, User];
 
-mongoose.connect(`${consts.dbPath}${consts.dbName}`, {
+let uri;
+let db;
+if (consts.environment === 'production') {
+    uri = consts.dbProd;
+    db = 'PAMM_Prod';
+}
+else {
+    uri = `${consts.dbPath}${consts.dbName}`;
+    db = consts.dbName;
+}
+
+mongoose.connect(uri, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -29,7 +40,7 @@ mongoose.connect(`${consts.dbPath}${consts.dbName}`, {
 
 mongoose.connection.on('connected',async () => {
     try {
-        console.log(`Mongoose connected to ${consts.dbName}`);
+        console.log(`Mongoose connected to ${db}`);
         console.log('Resetting database...')
         await Promise.all(
             models.map(async model => {
@@ -40,7 +51,7 @@ mongoose.connection.on('connected',async () => {
         await seedData();
         console.log('Data has been seeded');
         await mongoose.disconnect();
-        console.log(`Mongoose disconnected from ${consts.dbName}`);
+        console.log(`Mongoose disconnected from ${db}`);
     }
     catch (err) {
         console.log(err);

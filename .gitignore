@@ -44,6 +44,7 @@ client/coverage
 
 # production
 client/build
+server/public
 
 # misc
 .env.local
