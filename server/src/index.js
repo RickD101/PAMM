@@ -13,6 +13,9 @@ const userRouter      = require('./routes/user');
 const crudRouter      = require('./routes/crud');
 const workOrderRouter = require('./routes/workOrderGenerator');
 
+// CORS allows requests to come in from React
+app.use(cors());
+
 // middleware
 app.use(express.json());        // middleware for JSON parsing
 app.use(session({               // session middleware

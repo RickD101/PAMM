@@ -19,11 +19,14 @@ import ComponentRoutines from './components/level_4/ComponentRoutines';
 import MenuDrawer from './components/navigation/MenuDrawer';
 import Procedures from './components/level_1/Procedures';
 import ModifyProcedure from './components/level_2/ModifyProcedure';
+import Settings from './components/user/Settings';
+import NotificationModal from './components/general/NotificationModal';
 
 export default function App() {
 
     const [loginStatus, setLoginStatus] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [modal, setModal] = useState({open: false, msg: '', status: ''});
 
     useEffect(() => {
         getLoginStatus().then((response) => {
@@ -35,6 +38,12 @@ export default function App() {
 
     return (
         <Router>
+            <NotificationModal
+                open={modal.open}
+                msg={modal.msg}
+                status={modal.status}
+                setModal={setModal}
+            />
 
             <AppBarMenu loginStatus={loginStatus} setLoginStatus={setLoginStatus} setMenuOpen={setMenuOpen}/>
             <MenuDrawer menuOpen={menuOpen} setMenuOpen={setMenuOpen}/>
@@ -46,6 +55,9 @@ export default function App() {
                     </Route>
                     <Route exact path="/reports">
                         <Reports />
+                    </Route>
+                    <Route exact path="/settings">
+                        <Settings setLoginStatus={setLoginStatus} setModal={setModal}/>
                     </Route>
                     <Route exact path="/clients">
                         <Clients />
@@ -81,7 +93,11 @@ export default function App() {
                         <Redirect to="/"/>
                     </Route>
                 </Switch>
-                : <Login setLoginStatus={setLoginStatus}/>
+                : 
+                <Login 
+                    setLoginStatus={setLoginStatus}
+                    setModal={setModal}
+                />
             }
 
         </Router>

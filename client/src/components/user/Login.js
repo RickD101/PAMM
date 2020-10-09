@@ -75,6 +75,13 @@ export default function Login(props) {
                 password: password
             });
             if (response.status) {
+                if (response.notify) {
+                    props.setModal({
+                        open: true,
+                        msg: response.notifyMsg,
+                        status: 'good'
+                    })
+                }
                 props.setLoginStatus(true);
             }
             else if (response.field === 'username') {

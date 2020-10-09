@@ -4,6 +4,7 @@ const router  = express.Router();
 
 // model inclusions
 const User = require('../models/User');
+const generateAllWO = require('./nested_functions/generateAllWO');
 
 // login status route
 router.get('/', (req,res)=>{
@@ -20,6 +21,36 @@ router.get('/', (req,res)=>{
     }
 });
 
+router.get('/details', async (req,res)=>{
+    try{
+        // search for username availability
+        const findUser = await User.findById(req.session.user.id);
+
+        if (findUser) {
+            res.send({
+                status: true,
+                data: {
+                    username: findUser.username,
+                    autogen: findUser.autogen
+                }
+            });
+        }
+        else {
+            res.status(404).send({
+                status: false,
+                msg: 'Could not find user details.'
+            });
+        }
+    }
+    catch(err){
+        res.status(400).send({
+            status: false,
+            msg: 'Bad request.',
+            err: err
+        });
+    }
+});
+
 // new user route
 router.post('/new', async (req,res)=>{
     try{
@@ -31,6 +62,7 @@ router.post('/new', async (req,res)=>{
         if (!findUsername && req.body.password.length < 8){
             res.send({
                 status: false,
+                field: 'password',
                 msg: 'Password must contain at least 8 characters.'
             });
         }
@@ -48,12 +80,63 @@ router.post('/new', async (req,res)=>{
         else{
             res.send({
                 status: false,
-                msg: findUsername.username + ' already exists. Please select a different username.'
+                field: 'username',
+                msg: findUsername.username + ' already exists, please select a different username.'
             });
         }
     }
     catch(err){
         res.status(400).send({
+            status: false,
+            msg: 'Bad request.',
+            err: err
+        });
+    }
+});
+
+// update password route
+router.patch('/update', async (req,res)=>{
+    try{
+        const findUser = await User.findById(
+            req.session.user.id
+        );
+        if (findUser) {
+            if (await bcrypt.compare(req.body.password, findUser.password) && req.body.newPassword.length > 7) {
+                req.body.newPassword = await bcrypt.hash(req.body.newPassword, 10);
+                await findUser.updateOne({
+                    password: req.body.newPassword,
+                    autogen: req.body.autogen
+                }, {new: true, runValidators: true});
+                res.send({
+                    status: true,
+                    msg: req.session.user.username + ' updated.'
+                });
+            }
+            else if (req.body.newPassword.length < 8) {
+                res.send({
+                    status: false,
+                    field: 'newPassword',
+                    msg: 'Password must contain at least 8 characters.'
+                });
+            }
+            else {
+                res.status(404).send({
+                    status: false,
+                    field: 'password',
+                    msg: 'Incorrect password.'
+                });
+            }
+        }
+        else {
+            res.status(404).send({
+                status: false,
+                msg: 'User ID not found, try logging in again.'
+            });
+        }
+    }
+    catch(err){
+        res.status(400).send({
+            status: false,
             msg: 'Bad request.',
             err: err
         });
@@ -78,11 +161,32 @@ router.post('/login', async (req,res)=>{
                 username: savedUser.username,
                 id: savedUser._id
             };
-            res.send({
-                status: true,
-                msg: savedUser.username + ' logged in.',
-                username: savedUser.username
-            });
+            if (savedUser.autogen) {
+                const WOs = await generateAllWO(savedUser.autogen);
+                if (WOs.status) {
+                    res.send({
+                        status: true,
+                        notify: true,
+                        notifyMsg: WOs.msg,
+                        msg: savedUser.username + ' logged in.',
+                        username: savedUser.username
+                    });
+                }
+                else {
+                    res.send({
+                        status: true,
+                        msg: savedUser.username + ' logged in.',
+                        username: savedUser.username
+                    });
+                }
+            }
+            else {
+                res.send({
+                    status: true,
+                    msg: savedUser.username + ' logged in.',
+                    username: savedUser.username
+                });
+            }
         }
         else{
             res.status(404).send({
@@ -107,12 +211,14 @@ router.get('/logout', (req,res)=>{
         const currentUser = req.session.user.username;
         req.session.destroy(()=>{
             res.send({
+                status: true,
                 msg: currentUser + ' logged out.'
             });
         });
     }
     else{
         res.send({
+            status: false,
             msg: 'Already logged out.'
         });
     }
@@ -120,30 +226,35 @@ router.get('/logout', (req,res)=>{
 
 // delete user and associated data route
 router.delete('/delete', async (req,res)=>{
-    if (req.session.user){
-        try{
+    try {
+        const users = await User.find();
+        if (users.length > 1) {
             await User.findByIdAndDelete(
                 req.session.user.id
             );
             const username = req.session.user.username;
             req.session.destroy(()=>{
                 res.send({
+                    status: true,
                     msg: username + ' deleted.'
                 });
             });
         }
-        catch(err){
-            res.status(400).send({
-                msg: 'Bad request.',
-                err: err
+        else {
+            res.send({
+                status: false,
+                msg: 'At least one user must exist, please create another user before deleting the current user profile.'
             });
         }
     }
-    else{
-        res.send({
-            msg: 'Please login.'
+    catch(err){
+        res.status(400).send({
+            status: false,
+            msg: 'Bad request.',
+            err: err
         });
     }
+
 });
 
 module.exports = router;

@@ -233,6 +233,9 @@ export default function ManageWorkOrders(props) {
         if (data.scheduled) {
             renderData.scheduled = data.scheduled.freq_WO_gen_number + data.scheduled.freq_WO_gen_unit;
         }
+        else {
+            renderData.scheduled = '-';
+        }
 
         renderData.description = data.description;
 
@@ -267,11 +270,11 @@ export default function ManageWorkOrders(props) {
                         status: 'good'
                     });
                     
-                    const newDat = [...data].filter(dat => dat._id !== oldData._id);
-                    setData(newDat);
+                    const newData = [...data].filter(dat => dat._id !== oldData._id);
+                    setData(newData);
 
-                    const newFilterDat = [...filterData].filter(dat => dat._id !== oldData._id);
-                    setFilterData(newFilterDat);
+                    const newFilterData = [...filterData].filter(dat => dat._id !== oldData._id);
+                    setFilterData(newFilterData);
                 }
                 else {
                     throw new Error(`${response.msg}`);

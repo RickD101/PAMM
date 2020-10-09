@@ -12,6 +12,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 
 // inclusions
+import WeekView from '../calendar/WeekView';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -28,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
         height: 'inherit',
         boxSizing: 'inherit',
         color: theme.palette.text.secondary,
-        background: 'lightgrey',
+        background: 'white',
     },
     navButton: {
         padding: theme.spacing(2),
@@ -128,8 +129,8 @@ export default function Home(props) {
                         <Grid item xs={12} md={9}>
                             
                             <Grid item xs={12} className={classes.scheduleWindow}>
-                                <Paper className={classes.paper}>
-                                    <h1 className={classes.placeholder}>Interactive schedule coming soon...</h1>
+                                <Paper className={classes.paper} elevation={3}>
+                                    <WeekView />
                                 </Paper>
                             </Grid>
                             

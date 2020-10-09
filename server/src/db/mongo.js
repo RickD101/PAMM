@@ -2,7 +2,15 @@
 const mongoose = require('mongoose');
 const consts  = require('../consts');
 
-mongoose.connect(`${consts.dbPath}${consts.dbName}`, {
+let uri;
+if (consts.environment === 'production') {
+    uri = consts.dbProd;
+}
+else {
+    uri = `${consts.dbPath}${consts.dbName}`;
+}
+
+mongoose.connect(uri, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,

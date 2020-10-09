@@ -10,6 +10,9 @@ const schema = new mongoose.Schema({
         type: String,
         required: true
     },
+    autogen: {
+        type: Number
+    },
     role: String //optional extension for later
 });
 

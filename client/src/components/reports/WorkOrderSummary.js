@@ -3,6 +3,7 @@ import React from 'react';
 
 export default function WorkOrderSummary(props) {
     return (
-        <h1>work order summary</h1>
+        // eslint-disable-next-line
+        <h1 style={{marginTop: 250}}>🚧 Under construction 🚧</h1>
     )
 }

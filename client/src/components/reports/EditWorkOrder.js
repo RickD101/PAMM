@@ -134,7 +134,7 @@ export default function EditWorkOrder(props) {
         })
 
         retrieveWorkOrderData();
-
+    // eslint-disable-next-line
     }, []);
 
     const retrieveWorkOrderData = () => {

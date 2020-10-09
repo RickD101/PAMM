@@ -14,6 +14,7 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import StorefrontIcon from '@material-ui/icons/Storefront';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 const useStyles = makeStyles({
     list: {
@@ -92,17 +93,24 @@ export default function MenuDrawer(props) {
                         <ListItemText primary="Procedures" />
                     </ListItem>
                 </Link>
+                <Divider />
+                <Link to="/settings" className={classes.navButton}>
+                    <ListItem button>
+                        <ListItemIcon><SettingsIcon /></ListItemIcon>
+                        <ListItemText primary="Settings" />
+                    </ListItem>
+                </Link>
             </List>
         </div>
-  );
+    );
 
-  return (
-    <div>
-        <React.Fragment>
-          <Drawer anchor="left" open={props.menuOpen} onClose={toggleDrawer(false)}>
-            {list()}
-          </Drawer>
-        </React.Fragment>
-    </div>
-  );
+    return (
+        <div>
+            <>
+                <Drawer anchor="left" open={props.menuOpen} onClose={toggleDrawer(false)}>
+                    {list()}
+                </Drawer>
+            </>
+        </div>
+    );
 }
