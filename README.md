@@ -39,6 +39,6 @@ This formed the foundation of the app which was then built upon. For the user in
 * Proper inventory control through linking of work orders and items (inventory).
 * Implement mass generation/printing/deletion of work orders for given parameters.
 * Codebase, particularly on the client side, needs refactoring and reorganising as some components are too large/messy
-* Improved/ dynamic rendering for different screen sizes
+* Improved/responsive/dynamic rendering for different screen sizes
 * In addition, a simplified app is presented for mobile devices (or similar screen sizes).
 
