@@ -11,8 +11,8 @@ mkdir -p public
 cp -r ../client/build/* public/
 echo "***** Installing backend package dependencies..."
 npm install
-npm run seed
 echo "***** Seeding database..."
+npm run seed
 cd ../
 
 echo "=========================BUILD COMPLETE========================="
