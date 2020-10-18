@@ -65,9 +65,9 @@ const seedData = async () => {
     const componentIDs = [];
     const supplierIDs = [];
 
-    const password = await bcrypt.hash('password', 10);
+    const password = await bcrypt.hash('PAMMdemo', 10);
     await User.create({
-        username: 'admin',
+        username: 'PAMM',
         password: password
     })
     

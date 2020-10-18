@@ -7,6 +7,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import MuiAlert from '@material-ui/lab/Alert';
 
 // inclusions
 import userLogin from '../../api/user/userLogin';
@@ -29,9 +30,13 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(1),
     },
     submit: {
-        margin: theme.spacing(3, 0, 2),
+        margin: theme.spacing(3, 0, 6),
     },
 }));
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" style={{justifyContent: 'center', width: 650, margin: 'auto'}} {...props}/>;
+}
 
 export default function Login(props) {
     const classes = useStyles();
@@ -102,6 +107,7 @@ export default function Login(props) {
     }
 
     return (
+        <>
         <Container component="main" maxWidth="xs">
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
@@ -153,5 +159,7 @@ export default function Login(props) {
                 </form>
             </div>
         </Container>
+        <Alert severity="info">Input username: <b>PAMM</b> and password: <b>PAMMdemo</b> to access the demonstration version</Alert>
+        </>
     );
 }
